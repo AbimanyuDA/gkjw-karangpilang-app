@@ -86,15 +86,16 @@ lib/
 
 ## Database Architecture
 
-### Firebase Firestore (dokumen/PDF/video)
+### Firebase Firestore (text)
 - `warta_jemaat` – Warta jemaat PDF
 - `tata_ibadah` – Tata ibadah PDF
 - `renungan` – Renungan harian PDF
 - `siaran` – Video ibadah (YouTube ID)
 - `users` – User profile
 
-### Supabase PostgreSQL (objek/relasional)
+### Supabase PostgreSQL (objek/relasional/pdf)
 - `galeri` – Foto galeri
+- `banner` - Foto Banner kegiatan
 - `agenda` – Agenda kegiatan
 - `kependetaan` – Profil gembala
 - `kemajelisan` – Profil majelis

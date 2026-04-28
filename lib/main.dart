@@ -11,6 +11,9 @@ import 'core/constants/app_constants.dart';
 import 'core/theme/app_theme.dart';
 import 'core/utils/app_router.dart';
 import 'firebase_options.dart';
+import 'data/services/notification_service.dart';
+import 'data/services/sapaan_preference_service.dart';
+import 'data/services/supabase_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,6 +45,31 @@ void main() async {
     url: AppConstants.supabaseUrl,
     anonKey: AppConstants.supabaseAnonKey,
   );
+
+  // Initialize notifications
+  await NotificationService().initialize();
+
+  // Re-schedule notifications based on saved preferences
+  try {
+    final prefService = SapaanPreferenceService();
+    final pagiEnabled = await prefService.getSapaanPagiEnabled();
+    final malamEnabled = await prefService.getSapaanMalamEnabled();
+
+    if (pagiEnabled || malamEnabled) {
+      final config = await SupabaseService().getSapaanConfig();
+      if (config != null) {
+        if (pagiEnabled) {
+          await NotificationService().scheduleSapaanPagi(config);
+        }
+        if (malamEnabled) {
+          await NotificationService().scheduleSapaanMalam(config);
+        }
+      }
+    }
+  } catch (e) {
+    // If fetch fails, keep existing scheduled notifications unchanged
+    debugPrint('Failed to reschedule notifications on startup: $e');
+  }
 
   runApp(const ProviderScope(child: GkjwApp()));
 }

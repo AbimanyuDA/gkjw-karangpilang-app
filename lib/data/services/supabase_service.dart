@@ -199,4 +199,64 @@ class SupabaseService {
         await _client.from('tentang_aplikasi').select().limit(1).maybeSingle();
     return res;
   }
+
+  // ===== SAPAAN CONFIG =====
+  Future<SapaanConfigModel?> getSapaanConfig() async {
+    final res = await _client
+        .from('sapaan_config')
+        .select()
+        .limit(1)
+        .maybeSingle();
+    if (res == null) return null;
+    return SapaanConfigModel.fromJson(res);
+  }
+
+  Future<void> updateSapaanConfig(SapaanConfigModel item) async =>
+      await _client
+          .from('sapaan_config')
+          .update(item.toJson())
+          .eq('id', item.id);
+
+  // ===== SAPAAN AYAT RIWAYAT =====
+  Future<List<SapaanAyatRiwayatModel>> getSapaanAyatRiwayat() async {
+    final res = await _client
+        .from('sapaan_ayat_riwayat')
+        .select()
+        .order('created_at', ascending: false)
+        .limit(50);
+    return (res as List).map((e) => SapaanAyatRiwayatModel.fromJson(e)).toList();
+  }
+
+  Future<void> addSapaanAyatRiwayat(SapaanAyatRiwayatModel item) async =>
+      await _client.from('sapaan_ayat_riwayat').insert(item.toJson());
+
+  // ===== SAPAAN JADWAL HARIAN =====
+  Future<List<SapaanJadwalHarianModel>> getSapaanJadwalBulan(int tahun, int bulan) async {
+    final from = DateTime(tahun, bulan, 1).toIso8601String().substring(0, 10);
+    final to = DateTime(tahun, bulan + 1, 0).toIso8601String().substring(0, 10);
+    final res = await _client
+        .from('sapaan_jadwal_harian')
+        .select()
+        .gte('tanggal', from)
+        .lte('tanggal', to)
+        .order('tanggal');
+    return (res as List).map((e) => SapaanJadwalHarianModel.fromJson(e)).toList();
+  }
+
+  Future<SapaanJadwalHarianModel?> getSapaanJadwalTanggal(DateTime tanggal) async {
+    final tgl = tanggal.toIso8601String().substring(0, 10);
+    final res = await _client
+        .from('sapaan_jadwal_harian')
+        .select()
+        .eq('tanggal', tgl)
+        .maybeSingle();
+    if (res == null) return null;
+    return SapaanJadwalHarianModel.fromJson(res);
+  }
+
+  Future<void> upsertSapaanJadwal(SapaanJadwalHarianModel item) async {
+    await _client
+        .from('sapaan_jadwal_harian')
+        .upsert(item.toJson(), onConflict: 'tanggal');
+  }
 }

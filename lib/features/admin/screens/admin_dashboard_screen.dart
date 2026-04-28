@@ -235,8 +235,9 @@ class AdminDashboardScreen extends StatelessWidget {
                   ),
                 ),
                 _AdminCard(
-                  icon: Icons.notifications,
+                  icon: Icons.notifications_active,
                   title: 'Notifikasi',
+                  subtitle: 'Push & Sapaan Harian',
                   color: const Color(0xFFE74C3C),
                   onTap: () => Navigator.push(
                     context,

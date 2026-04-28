@@ -70,5 +70,7 @@
 	<string>Akses galeri diperlukan untuk mengunggah gambar banner.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Akses galeri diperlukan untuk menyimpan gambar banner.</string>
+	<key>NSUserNotificationUsageDescription</key>
+	<string>Izin notifikasi diperlukan untuk mengirim sapaan harian berisi ayat Alkitab.</string>
 </dict>
 </plist>

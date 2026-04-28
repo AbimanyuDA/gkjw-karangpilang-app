@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.gkjw.gkjw_karangpilang"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 35
     ndkVersion = flutter.ndkVersion
 
     compileOptions {

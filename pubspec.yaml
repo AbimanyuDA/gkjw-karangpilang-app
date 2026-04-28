@@ -52,6 +52,8 @@ dependencies:
 
   # Notifications
   flutter_local_notifications: ^18.0.1
+  shared_preferences: ^2.3.3
+  timezone: ^0.9.4
 
   # Icons
   cupertino_icons: ^1.0.8
