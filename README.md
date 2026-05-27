@@ -8,7 +8,7 @@ Aplikasi mobile resmi **Gereja Kristen Jawi Wetan Jemaat Karangpilang** berbasis
 |-------|-----------|
 | Framework | Flutter 3.41.3 |
 | Auth | Firebase Authentication (Email/Password) |
-| Database (text/string) | Firebase Firestore |
+| Database (dokumen/PDF) | Firebase Firestore |
 | Database (objek/relasional) | Supabase (PostgreSQL) |
 | Storage | Firebase Storage |
 | State Management | Riverpod |
@@ -86,16 +86,15 @@ lib/
 
 ## Database Architecture
 
-### Firebase Firestore (text)
+### Firebase Firestore (dokumen/PDF/video)
 - `warta_jemaat` – Warta jemaat PDF
 - `tata_ibadah` – Tata ibadah PDF
 - `renungan` – Renungan harian PDF
 - `siaran` – Video ibadah (YouTube ID)
 - `users` – User profile
 
-### Supabase PostgreSQL (objek/relasional/pdf)
+### Supabase PostgreSQL (objek/relasional)
 - `galeri` – Foto galeri
-- `banner` - Foto Banner kegiatan
 - `agenda` – Agenda kegiatan
 - `kependetaan` – Profil gembala
 - `kemajelisan` – Profil majelis

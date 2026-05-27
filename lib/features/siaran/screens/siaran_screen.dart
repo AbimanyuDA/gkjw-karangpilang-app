@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../data/models/pdf_item_model.dart';
 import '../../../providers/providers.dart';
@@ -291,12 +292,21 @@ class _VideoCard extends StatelessWidget {
             },
             child: Stack(
               children: [
-                Image.network(
-                  thumbUrl,
+                CachedNetworkImage(
+                  imageUrl: thumbUrl,
                   width: double.infinity,
                   height: 200,
                   fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => Container(
+                  memCacheWidth: 320,
+                  placeholder: (context, url) => Shimmer.fromColors(
+                    baseColor: Colors.grey.shade300,
+                    highlightColor: Colors.grey.shade100,
+                    child: Container(
+                      height: 200,
+                      color: Colors.white,
+                    ),
+                  ),
+                  errorWidget: (context, url, error) => Container(
                     height: 200,
                     color: AppColors.primary.withValues(alpha: 0.1),
                     child: const Icon(

@@ -2,12 +2,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../data/models/pdf_item_model.dart';
 import '../../../data/services/firestore_service.dart';
 import '../../../providers/providers.dart';
 import 'package:dio/dio.dart' as dio;
-import '../../../env.dart';
 
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
@@ -21,7 +21,7 @@ class _AdminSiaranScreenState extends ConsumerState<AdminSiaranScreen> {
   final _service = FirestoreService();
 
   // YouTube Data API v3 key
-  static final _ytApiKey = Env.youtubeApiKey;
+  static const _ytApiKey = 'AIzaSyAVLA1CZ_wzJmjlMLtJ_Npai5g9JnvphTo';
 
   static const _kategoriList = [
     {'value': 'umum', 'label': 'Ibadah Umum'},
@@ -350,12 +350,17 @@ class _AdminSiaranScreenState extends ConsumerState<AdminSiaranScreen> {
                     child: ListTile(
                       leading: ClipRRect(
                         borderRadius: BorderRadius.circular(8),
-                        child: Image.network(
-                          'https://img.youtube.com/vi/${v.youtubeId}/default.jpg',
+                        child: CachedNetworkImage(
+                          imageUrl: 'https://img.youtube.com/vi/${v.youtubeId}/default.jpg',
                           width: 60,
                           height: 45,
                           fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => Container(
+                          memCacheWidth: 120,
+                          placeholder: (_, __) => Container(
+                            width: 60, height: 45,
+                            color: AppColors.primary.withValues(alpha: 0.05),
+                          ),
+                          errorWidget: (_, __, ___) => Container(
                             width: 60, height: 45,
                             color: AppColors.primary.withValues(alpha: 0.1),
                             child: const Icon(Icons.play_circle, color: AppColors.primary),

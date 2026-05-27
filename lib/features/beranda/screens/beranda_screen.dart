@@ -413,18 +413,18 @@ class _BannerCarousel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Slide image area — ratio 16:7 (landscape banner)
-        AspectRatio(
-          aspectRatio: 16 / 7,
-          child: PageView.builder(
-            controller: pageController,
-            onPageChanged: onPageChanged,
-            itemCount: banners.length,
-            itemBuilder: (context, index) {
-              final banner = banners[index];
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Container(
+        // Slide image area — ratio 16:9 (landscape banner)
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: AspectRatio(
+            aspectRatio: 16 / 9,
+            child: PageView.builder(
+              controller: pageController,
+              onPageChanged: onPageChanged,
+              itemCount: banners.length,
+              itemBuilder: (context, index) {
+                final banner = banners[index];
+                return Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(16),
@@ -441,6 +441,7 @@ class _BannerCarousel extends StatelessWidget {
                     child: CachedNetworkImage(
                       imageUrl: banner.imageUrl,
                       fit: BoxFit.cover,
+                      memCacheWidth: 800,
                       placeholder: (context, url) => Container(
                         color: AppColors.primary.withValues(alpha: 0.1),
                         child: const Center(
@@ -462,9 +463,9 @@ class _BannerCarousel extends StatelessWidget {
                       ),
                     ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ),
 
@@ -512,7 +513,7 @@ class _BannerPlaceholder extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: AspectRatio(
-        aspectRatio: 16 / 7,
+        aspectRatio: 16 / 9,
         child: Container(
           decoration: BoxDecoration(
             color: Colors.white,

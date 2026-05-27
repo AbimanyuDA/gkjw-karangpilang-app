@@ -52,13 +52,13 @@ dependencies:
 
   # Notifications
   flutter_local_notifications: ^18.0.1
-  shared_preferences: ^2.3.3
-  timezone: ^0.9.4
 
   # Icons
   cupertino_icons: ^1.0.8
   flutter_svg: ^2.1.0
   youtube_explode_dart: ^3.0.5
+  image: ^4.8.0
+  crop_your_image: ^2.0.0
 
 dev_dependencies:
   flutter_test:
@@ -66,6 +66,9 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   build_runner: ^2.4.15
   riverpod_generator: ^2.6.5
+
+dependency_overrides:
+  path_provider_foundation: 2.5.1
 
 flutter:
   uses-material-design: true

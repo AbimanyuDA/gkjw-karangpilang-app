@@ -17,8 +17,7 @@ migrate_working_dir/
 *.ipr
 *.iws
 .idea/
-.kiro/
-
+.kiro
 # The .vscode folder contains launch configuration and tasks you configure in
 # VS Code which you may wish to be included in version control, so this line
 # is commented out by default.
@@ -54,15 +53,6 @@ app.*.map.json
 android/app/google-services.json
 ios/Runner/GoogleService-Info.plist
 
-# Firebase options (berisi API keys)
-lib/firebase_options.dart
-
-# Environment / secrets file
-.env
-*.env
-env.dart
-lib/env.dart
-
 # Scratch / temporary test files di root
 scratch.dart
 test_allorigins.dart
@@ -80,3 +70,7 @@ test_regex.dart
 test_rss.dart
 test_yt.dart
 test_ytapi.dart
+
+# Secrets
+env.dart
+lib/env.dart

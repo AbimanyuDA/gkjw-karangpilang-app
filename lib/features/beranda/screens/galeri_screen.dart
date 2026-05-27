@@ -88,6 +88,7 @@ class GaleriScreen extends ConsumerWidget {
                             child: CachedNetworkImage(
                               imageUrl: item.imageUrl,
                               fit: BoxFit.cover,
+                              memCacheWidth: 300,
                               placeholder: (_, __) => Container(color: Colors.grey.shade200),
                               errorWidget: (_, __, ___) => Container(
                                 color: Colors.grey.shade200,
@@ -120,6 +121,7 @@ class GaleriScreen extends ConsumerWidget {
                 imageUrl: url,
                 fit: BoxFit.cover,
                 width: double.infinity,
+                memCacheWidth: 900,
               ),
             ),
             Padding(

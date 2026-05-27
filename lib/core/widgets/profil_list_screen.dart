@@ -53,7 +53,7 @@ class ProfilListScreen extends StatelessWidget {
                           radius: 36,
                           backgroundColor: AppColors.primary.withValues(alpha: 0.1),
                           backgroundImage: item[fotoKey] != null
-                              ? CachedNetworkImageProvider(item[fotoKey])
+                              ? ResizeImage(CachedNetworkImageProvider(item[fotoKey]), width: 150, height: 150)
                               : null,
                           child: item[fotoKey] == null
                               ? Text(

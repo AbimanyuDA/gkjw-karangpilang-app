@@ -1,10 +1,13 @@
 // lib/features/admin/screens/admin_banner_screen.dart
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/image_compressor.dart';
+import '../../../core/widgets/image_crop_screen.dart';
 import '../../../data/models/supabase_models.dart';
 import '../../../data/services/supabase_service.dart';
 
@@ -54,21 +57,44 @@ class _AdminBannerScreenState extends State<AdminBannerScreen> {
   Future<void> _pickAndUpload() async {
     final picked = await _picker.pickImage(
       source: ImageSource.gallery,
-      imageQuality: 85,
     );
     if (picked == null) return;
 
-    final file = File(picked.path);
-    final ext = picked.path.split('.').last.toLowerCase();
-    final fileName = 'banner_${DateTime.now().millisecondsSinceEpoch}.$ext';
+    final imageBytes = await picked.readAsBytes();
+    if (!mounted) return;
+
+    // Buka screen untuk crop/preview dengan rasio 16:9
+    final Uint8List? croppedBytes = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ImageCropScreen(
+          imageBytes: imageBytes,
+          aspectRatio: 16 / 9,
+          title: 'Sesuaikan Banner (16:9)',
+        ),
+      ),
+    );
+
+    if (croppedBytes == null) return;
 
     setState(() => _isUploading = true);
+    File? tempFile;
+    File? compressedFile;
     try {
+      // Simpan hasil crop sementara
+      final tempDir = Directory.systemTemp;
+      tempFile = File('${tempDir.path}/cropped_banner_${DateTime.now().millisecondsSinceEpoch}.jpg');
+      await tempFile.writeAsBytes(croppedBytes);
+
+      // Kompres gambar otomatis under 100kb
+      compressedFile = await ImageCompressor.compressImage(tempFile);
+      final fileName = 'banner_${DateTime.now().millisecondsSinceEpoch}.jpg';
+
       // Upload ke Supabase Storage bucket "banners"
       await _supabase.storage.from('banners').upload(
         fileName,
-        file,
-        fileOptions: FileOptions(contentType: 'image/$ext', upsert: false),
+        compressedFile,
+        fileOptions: const FileOptions(contentType: 'image/jpeg', upsert: false),
       );
 
       // Ambil public URL
@@ -91,6 +117,16 @@ class _AdminBannerScreenState extends State<AdminBannerScreen> {
     } catch (e) {
       _showSnack('Gagal upload: $e', isError: true);
     } finally {
+      if (tempFile != null) {
+        try {
+          await tempFile.delete();
+        } catch (_) {}
+      }
+      if (compressedFile != null) {
+        try {
+          await compressedFile.delete();
+        } catch (_) {}
+      }
       if (mounted) setState(() => _isUploading = false);
     }
   }
@@ -232,14 +268,14 @@ class _RatioInfoCard extends StatelessWidget {
         children: [
           // Contoh rasio visual
           Container(
-            width: 80, height: 35,
+            width: 80, height: 45,
             decoration: BoxDecoration(
               color: AppColors.primary.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(6),
               border: Border.all(color: AppColors.primary.withValues(alpha: 0.4)),
             ),
             child: const Center(
-              child: Text('16 : 7',
+              child: Text('16 : 9',
                   style: TextStyle(fontFamily: 'Poppins', fontSize: 12,
                       fontWeight: FontWeight.w700, color: AppColors.primary)),
             ),
@@ -254,8 +290,8 @@ class _RatioInfoCard extends StatelessWidget {
                         fontWeight: FontWeight.w700, color: AppColors.primary)),
                 SizedBox(height: 4),
                 _InfoRow(icon: Icons.photo_size_select_actual,
-                    label: 'Resolusi', value: '1600 × 700 px'),
-                _InfoRow(icon: Icons.straighten, label: 'Minimal', value: '800 × 350 px'),
+                    label: 'Resolusi', value: '1280 × 720 px'),
+                _InfoRow(icon: Icons.straighten, label: 'Minimal', value: '800 × 450 px'),
                 _InfoRow(icon: Icons.storage, label: 'Format', value: 'JPG / PNG / WebP'),
               ],
             ),
@@ -315,9 +351,9 @@ class _BannerCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // Preview gambar rasio 16:7
+          // Preview gambar rasio 16:9
           AspectRatio(
-            aspectRatio: 16 / 7,
+            aspectRatio: 16 / 9,
             child: ClipRRect(
               borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
               child: Stack(
@@ -326,6 +362,7 @@ class _BannerCard extends StatelessWidget {
                   CachedNetworkImage(
                     imageUrl: banner.imageUrl,
                     fit: BoxFit.cover,
+                    memCacheWidth: 600,
                     placeholder: (ctx2, url) => Container(
                       color: AppColors.primary.withValues(alpha: 0.08),
                       child: const Center(child: CircularProgressIndicator(

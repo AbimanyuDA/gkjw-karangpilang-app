@@ -114,6 +114,7 @@ class _BookCardState extends State<_BookCard> {
                       width: 68,
                       height: 90,
                       fit: BoxFit.cover,
+                      memCacheWidth: 150,
                     )
                   : Container(
                       width: 68,

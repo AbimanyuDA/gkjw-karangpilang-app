@@ -1,11 +1,14 @@
 // lib/features/admin/screens/admin_gereja_cover_screen.dart
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/image_compressor.dart';
+import '../../../core/widgets/image_crop_screen.dart';
 
 class AdminGerejaCoverScreen extends StatefulWidget {
   const AdminGerejaCoverScreen({super.key});
@@ -38,26 +41,45 @@ class _AdminGerejaCoverScreenState extends State<AdminGerejaCoverScreen> {
 
     final picked = await _picker.pickImage(
       source: ImageSource.gallery,
-      imageQuality: 85,
     );
     if (picked == null) return;
 
+    final imageBytes = await picked.readAsBytes();
+    if (!mounted) return;
+
+    // Buka screen untuk crop/preview dengan rasio 16:9
+    final Uint8List? croppedBytes = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ImageCropScreen(
+          imageBytes: imageBytes,
+          aspectRatio: 16 / 9,
+          title: 'Sesuaikan Cover (16:9)',
+        ),
+      ),
+    );
+
+    if (croppedBytes == null) return;
+
     setState(() => _uploading[item.key] = true);
 
+    File? tempFile;
+    File? compressedFile;
     try {
-      final file = File(picked.path);
-      String ext = picked.path.split('.').last.toLowerCase();
-      if (ext.isEmpty || !['jpg', 'jpeg', 'png', 'webp'].contains(ext)) {
-        ext = 'jpg';
-      }
-      
-      final fileName = '${item.key}_${DateTime.now().millisecondsSinceEpoch}.$ext';
+      // Simpan hasil crop sementara
+      final tempDir = Directory.systemTemp;
+      tempFile = File('${tempDir.path}/cropped_cover_${DateTime.now().millisecondsSinceEpoch}.jpg');
+      await tempFile.writeAsBytes(croppedBytes);
+
+      // Kompres gambar otomatis under 100kb
+      compressedFile = await ImageCompressor.compressImage(tempFile);
+      final fileName = '${item.key}_${DateTime.now().millisecondsSinceEpoch}.jpg';
       
       // Upload ke Supabase Storage, bucket: 'gereja_covers'
       await _supabase.storage.from('gereja_covers').upload(
         fileName, 
-        file,
-        fileOptions: FileOptions(contentType: 'image/$ext', upsert: true),
+        compressedFile,
+        fileOptions: const FileOptions(contentType: 'image/jpeg', upsert: true),
       );
 
       final downloadUrl = _supabase.storage.from('gereja_covers').getPublicUrl(fileName);
@@ -68,6 +90,16 @@ class _AdminGerejaCoverScreenState extends State<AdminGerejaCoverScreen> {
     } catch (e) {
       if (mounted) _showSnack('Gagal upload: $e', isError: true);
     } finally {
+      if (tempFile != null) {
+        try {
+          await tempFile.delete();
+        } catch (_) {}
+      }
+      if (compressedFile != null) {
+        try {
+          await compressedFile.delete();
+        } catch (_) {}
+      }
       if (mounted) setState(() => _uploading[item.key] = false);
     }
   }
@@ -300,6 +332,7 @@ class _AdminGerejaCoverScreenState extends State<AdminGerejaCoverScreen> {
                                   CachedNetworkImage(
                                     imageUrl: imageUrl,
                                     fit: BoxFit.cover,
+                                    memCacheWidth: 600,
                                     placeholder: (_, __) => Container(color: Colors.grey.shade200),
                                     errorWidget: (_, __, ___) => _buildPlaceholder(item),
                                   )

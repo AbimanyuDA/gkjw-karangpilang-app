@@ -45,6 +45,7 @@ class ProfilRuanganScreen extends ConsumerWidget {
                             height: 160,
                             width: double.infinity,
                             fit: BoxFit.cover,
+                            memCacheWidth: 600,
                           )
                         else
                           Container(

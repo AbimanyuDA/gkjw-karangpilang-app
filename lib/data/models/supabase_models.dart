@@ -327,7 +327,7 @@ class SapaanConfigModel {
 
   factory SapaanConfigModel.fromJson(Map<String, dynamic> json) =>
       SapaanConfigModel(
-        id: json['id'],
+        id: json['id'] ?? '',
         jamPagi: json['jam_pagi'] ?? 7,
         menitPagi: json['menit_pagi'] ?? 0,
         jamMalam: json['jam_malam'] ?? 19,
@@ -346,7 +346,6 @@ class SapaanConfigModel {
         'menit_malam': menitMalam,
         'ayat_pagi': ayatPagi,
         'ayat_malam': ayatMalam,
-        'updated_at': DateTime.now().toIso8601String(),
       };
 
   SapaanConfigModel copyWith({
@@ -358,110 +357,17 @@ class SapaanConfigModel {
     String? ayatPagi,
     String? ayatMalam,
     DateTime? updatedAt,
-  }) =>
-      SapaanConfigModel(
-        id: id ?? this.id,
-        jamPagi: jamPagi ?? this.jamPagi,
-        menitPagi: menitPagi ?? this.menitPagi,
-        jamMalam: jamMalam ?? this.jamMalam,
-        menitMalam: menitMalam ?? this.menitMalam,
-        ayatPagi: ayatPagi ?? this.ayatPagi,
-        ayatMalam: ayatMalam ?? this.ayatMalam,
-        updatedAt: updatedAt ?? this.updatedAt,
-      );
+  }) {
+    return SapaanConfigModel(
+      id: id ?? this.id,
+      jamPagi: jamPagi ?? this.jamPagi,
+      menitPagi: menitPagi ?? this.menitPagi,
+      jamMalam: jamMalam ?? this.jamMalam,
+      menitMalam: menitMalam ?? this.menitMalam,
+      ayatPagi: ayatPagi ?? this.ayatPagi,
+      ayatMalam: ayatMalam ?? this.ayatMalam,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
 }
 
-class SapaanAyatRiwayatModel {
-  final String id;
-  final String sesi; // 'pagi' atau 'malam'
-  final String ayat;
-  final String? tema;
-  final String sumber; // 'manual' atau 'ai'
-  final int jam;
-  final int menit;
-  final DateTime createdAt;
-
-  const SapaanAyatRiwayatModel({
-    required this.id,
-    required this.sesi,
-    required this.ayat,
-    this.tema,
-    required this.sumber,
-    required this.jam,
-    required this.menit,
-    required this.createdAt,
-  });
-
-  factory SapaanAyatRiwayatModel.fromJson(Map<String, dynamic> json) =>
-      SapaanAyatRiwayatModel(
-        id: json['id'],
-        sesi: json['sesi'],
-        ayat: json['ayat'],
-        tema: json['tema'],
-        sumber: json['sumber'] ?? 'manual',
-        jam: json['jam'] ?? 0,
-        menit: json['menit'] ?? 0,
-        createdAt: json['created_at'] != null
-            ? DateTime.parse(json['created_at'])
-            : DateTime.now(),
-      );
-
-  Map<String, dynamic> toJson() => {
-        'sesi': sesi,
-        'ayat': ayat,
-        'tema': tema,
-        'sumber': sumber,
-        'jam': jam,
-        'menit': menit,
-      };
-}
-
-class SapaanJadwalHarianModel {
-  final String id;
-  final DateTime tanggal;
-  final String? ayatPagi;
-  final String? ayatMalam;
-  final String? tema;
-  final String sumberPagi; // 'manual' atau 'ai'
-  final String sumberMalam;
-  final DateTime updatedAt;
-
-  const SapaanJadwalHarianModel({
-    required this.id,
-    required this.tanggal,
-    this.ayatPagi,
-    this.ayatMalam,
-    this.tema,
-    this.sumberPagi = 'manual',
-    this.sumberMalam = 'manual',
-    required this.updatedAt,
-  });
-
-  factory SapaanJadwalHarianModel.fromJson(Map<String, dynamic> json) =>
-      SapaanJadwalHarianModel(
-        id: json['id'],
-        tanggal: DateTime.parse(json['tanggal']),
-        ayatPagi: json['ayat_pagi'],
-        ayatMalam: json['ayat_malam'],
-        tema: json['tema'],
-        sumberPagi: json['sumber_pagi'] ?? 'manual',
-        sumberMalam: json['sumber_malam'] ?? 'manual',
-        updatedAt: json['updated_at'] != null
-            ? DateTime.parse(json['updated_at'])
-            : DateTime.now(),
-      );
-
-  Map<String, dynamic> toJson() => {
-        'tanggal': tanggal.toIso8601String().substring(0, 10),
-        'ayat_pagi': ayatPagi,
-        'ayat_malam': ayatMalam,
-        'tema': tema,
-        'sumber_pagi': sumberPagi,
-        'sumber_malam': sumberMalam,
-        'updated_at': DateTime.now().toIso8601String(),
-      };
-
-  bool get hasPagi => ayatPagi != null && ayatPagi!.isNotEmpty;
-  bool get hasMalam => ayatMalam != null && ayatMalam!.isNotEmpty;
-  bool get isComplete => hasPagi && hasMalam;
-}

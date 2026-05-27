@@ -145,6 +145,7 @@ class _AdminGaleriScreenState extends ConsumerState<AdminGaleriScreen> {
                           width: double.infinity,
                           height: double.infinity,
                           fit: BoxFit.cover,
+                          memCacheWidth: 300,
                           placeholder: (_, __) => Container(
                             color: AppColors.primary.withValues(alpha: 0.1),
                           ),

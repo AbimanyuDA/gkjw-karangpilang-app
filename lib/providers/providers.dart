@@ -1,8 +1,6 @@
 // lib/providers/providers.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/services/firestore_service.dart';
-import '../data/services/notification_service.dart';
-import '../data/services/sapaan_preference_service.dart';
 import '../data/services/supabase_service.dart';
 import '../data/models/supabase_models.dart';
 
@@ -81,21 +79,3 @@ final tentangProvider = FutureProvider(
 
 final sapaanConfigProvider = FutureProvider<SapaanConfigModel?>(
     (ref) => ref.watch(supabaseServiceProvider).getSapaanConfig());
-
-final sapaanAyatRiwayatProvider = FutureProvider<List<SapaanAyatRiwayatModel>>(
-    (ref) => ref.watch(supabaseServiceProvider).getSapaanAyatRiwayat());
-
-// Sapaan Jadwal Harian — parameter: (tahun, bulan)
-final sapaanJadwalBulanParamProvider =
-    StateProvider<(int, int)>((ref) => (DateTime.now().year, DateTime.now().month));
-
-final sapaanJadwalBulanProvider = FutureProvider<List<SapaanJadwalHarianModel>>((ref) {
-  final param = ref.watch(sapaanJadwalBulanParamProvider);
-  return ref.watch(supabaseServiceProvider).getSapaanJadwalBulan(param.$1, param.$2);
-});
-
-final notificationServiceProvider =
-    Provider<NotificationService>((ref) => NotificationService());
-
-final sapaanPreferenceServiceProvider =
-    Provider<SapaanPreferenceService>((ref) => SapaanPreferenceService());

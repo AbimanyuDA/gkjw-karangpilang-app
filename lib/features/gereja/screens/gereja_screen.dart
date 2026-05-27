@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import '../../../core/theme/app_theme.dart';
 
 class GerejaScreen extends StatelessWidget {
   const GerejaScreen({super.key});
@@ -165,9 +164,8 @@ class _GerejaCoverCard extends StatelessWidget {
       onTap: onTap,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(18),
-        child: SizedBox(
-          height: 185,
-          width: double.infinity,
+        child: AspectRatio(
+          aspectRatio: 16 / 9,
           child: Stack(
             fit: StackFit.expand,
             children: [
@@ -268,6 +266,7 @@ class _GerejaCoverCard extends StatelessWidget {
       return CachedNetworkImage(
         imageUrl: imageUrl,
         fit: BoxFit.cover,
+        memCacheWidth: 640,
         placeholder: (_, __) => _buildPlaceholder(),
         errorWidget: (_, __, ___) => _buildPlaceholder(),
       );
