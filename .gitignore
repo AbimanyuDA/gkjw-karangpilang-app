@@ -17,7 +17,7 @@ migrate_working_dir/
 *.ipr
 *.iws
 .idea/
-.kiro
+.kiro/
 # The .vscode folder contains launch configuration and tasks you configure in
 # VS Code which you may wish to be included in version control, so this line
 # is commented out by default.
@@ -74,3 +74,5 @@ test_ytapi.dart
 # Secrets
 env.dart
 lib/env.dart
+.kiro/
+
