@@ -1,0 +1,76 @@
+# Stack produksi GKJW Karangpilang: PostgreSQL + API Go + Caddy (HTTPS) + backup harian.
+# Jalankan dari folder deploy/:  docker compose up -d --build
+name: gkjw
+
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-gkjw}
+      POSTGRES_USER: ${POSTGRES_USER:-gkjw}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?isi POSTGRES_PASSWORD di .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    # Tidak ada `ports:` — database hanya bisa diakses dari jaringan internal Docker.
+
+  api:
+    build: ../backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-gkjw}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-gkjw}?sslmode=disable
+      JWT_SECRET: ${JWT_SECRET:?isi JWT_SECRET di .env (min. 32 karakter)}
+      JWT_TTL: ${JWT_TTL:-168h}
+      PUBLIC_BASE_URL: https://${DOMAIN:?isi DOMAIN di .env}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-}
+      TRUST_PROXY: "true"
+    volumes:
+      - uploads:/data/uploads
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - api
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      DOMAIN: ${DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+  backup:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGHOST: db
+      PGDATABASE: ${POSTGRES_DB:-gkjw}
+      PGUSER: ${POSTGRES_USER:-gkjw}
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      BACKUP_KEEP_DAYS: ${BACKUP_KEEP_DAYS:-14}
+    volumes:
+      - ./backup.sh:/backup.sh:ro
+      - ./backups:/backups
+      - uploads:/uploads:ro
+    entrypoint: ["/bin/sh", "/backup.sh"]
+
+volumes:
+  pgdata:
+  uploads:
+  caddy_data:
+  caddy_config:
