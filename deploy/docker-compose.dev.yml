@@ -1,0 +1,39 @@
+# Stack lokal untuk development: PostgreSQL + API di http://localhost:8080 (tanpa Caddy/HTTPS).
+# Dari root repo:  make dev
+name: gkjw-dev
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: gkjw
+      POSTGRES_USER: gkjw
+      POSTGRES_PASSWORD: gkjw-dev-password
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gkjw -d gkjw"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: ../backend
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://gkjw:gkjw-dev-password@db:5432/gkjw?sslmode=disable
+      JWT_SECRET: dev-only-secret-change-me-0123456789abcdef
+      # Emulator Android mengakses laptop lewat 10.0.2.2; ganti ke IP LAN untuk HP fisik.
+      PUBLIC_BASE_URL: ${DEV_PUBLIC_BASE_URL:-http://10.0.2.2:8080}
+    ports:
+      - "8080:8080"
+    volumes:
+      - uploads:/data/uploads
+
+volumes:
+  pgdata:
+  uploads:
