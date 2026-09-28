@@ -23,6 +23,25 @@ const (
 // defaultMaxLen dipakai bila Field.MaxLen tidak diisi.
 const defaultMaxLen = 5000
 
+// Input adalah jenis kontrol form yang dipakai website admin.
+type Input string
+
+// Jenis input form admin. Kosong = diturunkan dari FieldType.
+const (
+	InputText     Input = "text"
+	InputTextarea Input = "textarea"
+	InputURL      Input = "url"
+	InputImage    Input = "image" // upload gambar ke bucket Field.Upload
+	InputPDF      Input = "pdf"   // upload PDF ke bucket Field.Upload
+	InputColor    Input = "color"
+	InputSelect   Input = "select"
+	InputNumber   Input = "number"
+	InputSwitch   Input = "switch"
+	InputDateTime Input = "datetime"
+	InputDate     Input = "date"
+	InputYouTube  Input = "youtube" // ID video; admin bisa menempel link lengkap
+)
+
 // Field mendeskripsikan satu kolom yang boleh ditulis lewat API.
 type Field struct {
 	Name     string
@@ -33,10 +52,24 @@ type Field struct {
 	URL      bool     // khusus Text: harus diawali http:// atau https://
 	OneOf    []string // khusus Text: nilai yang diizinkan
 	Min, Max *int     // khusus Int
+	Pattern  string   // khusus Text: regex yang harus cocok (mis. warna hex)
+
+	// Metadata untuk website admin (tidak memengaruhi validasi).
+	Label  string
+	Help   string
+	Input  Input
+	Upload string // bucket upload untuk InputImage / InputPDF
 }
 
 // Resource mendeskripsikan satu tabel yang diekspos lewat API.
 type Resource struct {
+	// Metadata untuk website admin.
+	Label       string   // nama menu, mis. "Warta & Tata Ibadah"
+	Group       string   // kelompok menu di sidebar
+	Description string   // penjelasan singkat di atas halaman
+	Columns     []string // kolom yang tampil di tabel daftar
+	TitleField  string   // field yang dipakai sebagai judul baris
+
 	Path        string   // segmen URL, mis. "profil-ruangan"
 	Table       string   // nama tabel PostgreSQL
 	Fields      []Field  // kolom yang bisa ditulis

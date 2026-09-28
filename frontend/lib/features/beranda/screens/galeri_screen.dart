@@ -46,8 +46,8 @@ class GaleriScreen extends ConsumerWidget {
           Expanded(
             child: galeriAsync.when(
               loading: () => Shimmer.fromColors(
-                baseColor: Colors.grey.shade300,
-                highlightColor: Colors.grey.shade100,
+                baseColor: AppColors.surfaceAlt,
+                highlightColor: AppColors.cardBg,
                 child: GridView.count(
                   crossAxisCount: 3,
                   mainAxisSpacing: 4,
@@ -55,13 +55,13 @@ class GaleriScreen extends ConsumerWidget {
                   padding: const EdgeInsets.all(4),
                   children: List.generate(
                     9,
-                    (_) => Container(color: Colors.white),
+                    (_) => Container(color: AppColors.cardBg),
                   ),
                 ),
               ),
               error: (e, _) => const Center(child: Text('Gagal memuat galeri')),
               data: (items) => items.isEmpty
-                  ? const Center(
+                  ? Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -89,10 +89,10 @@ class GaleriScreen extends ConsumerWidget {
                               imageUrl: item.imageUrl,
                               fit: BoxFit.cover,
                               memCacheWidth: 300,
-                              placeholder: (_, __) => Container(color: Colors.grey.shade200),
+                              placeholder: (_, __) => Container(color: AppColors.surfaceAlt),
                               errorWidget: (_, __, ___) => Container(
-                                color: Colors.grey.shade200,
-                                child: const Icon(Icons.broken_image, color: Colors.grey),
+                                color: AppColors.surfaceAlt,
+                                child: Icon(Icons.broken_image, color: AppColors.textLight),
                               ),
                             ),
                           ),
@@ -160,10 +160,10 @@ class _YearChip extends StatelessWidget {
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
           decoration: BoxDecoration(
-            color: selected ? AppColors.primary : Colors.white,
+            color: selected ? AppColors.primary : AppColors.cardBg,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: selected ? AppColors.primary : Colors.grey.shade300,
+              color: selected ? AppColors.primary : AppColors.line,
             ),
           ),
           child: Text(

@@ -32,13 +32,13 @@ class FaqScreen extends ConsumerWidget {
                     width: 32,
                     height: 32,
                     decoration: BoxDecoration(
-                      color: AppColors.gold500.withValues(alpha: 0.16),
+                      color: AppColors.tint,
                       shape: BoxShape.circle,
                     ),
                     child: Center(
                       child: Text(
                         '${index + 1}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'PlusJakartaSans',
                           fontWeight: FontWeight.w700,
                           color: AppColors.primary,
@@ -49,7 +49,7 @@ class FaqScreen extends ConsumerWidget {
                   ),
                   title: Text(
                     item.pertanyaan,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'PlusJakartaSans',
                       fontWeight: FontWeight.w600,
                       fontSize: 13,
@@ -59,7 +59,7 @@ class FaqScreen extends ConsumerWidget {
                   children: [
                     Text(
                       item.jawaban,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'PlusJakartaSans',
                         fontSize: 13,
                         color: AppColors.textSecondary,

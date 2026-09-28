@@ -21,27 +21,14 @@ class TentangScreen extends ConsumerWidget {
           padding: const EdgeInsets.all(24),
           child: Column(
             children: [
-              // App icon
-              Container(
-                width: 100,
-                height: 100,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [AppColors.primary, AppColors.primaryDark],
-                  ),
-                  borderRadius: BorderRadius.circular(24),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primary.withValues(alpha: 0.3),
-                      blurRadius: 20,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
-                ),
-                child: const Icon(Icons.church, color: Colors.white, size: 56),
+              // Logo polos, tanpa latar
+              Image.asset(
+                'assets/images/logo.png',
+                width: 110,
+                semanticLabel: 'Logo GKJW Karangpilang',
               ),
               const SizedBox(height: 16),
-              const Text(
+              Text(
                 AppConstants.appName,
                 style: TextStyle(
                   fontFamily: 'PlusJakartaSans',
@@ -52,7 +39,7 @@ class TentangScreen extends ConsumerWidget {
               ),
               Text(
                 'Versi ${info?['versi'] ?? AppConstants.appVersion}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'PlusJakartaSans',
                   fontSize: 14,
                   color: AppColors.textSecondary,
@@ -63,14 +50,14 @@ class TentangScreen extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.all(18),
                   decoration: BoxDecoration(
-                    color: AppColors.gold500.withValues(alpha: 0.16),
+                    color: AppColors.tint,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(color: AppColors.primary.withValues(alpha: 0.15)),
                   ),
                   child: Text(
                     info!['deskripsi'],
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'PlusJakartaSans',
                       fontSize: 13,
                       color: AppColors.textSecondary,
@@ -84,7 +71,7 @@ class TentangScreen extends ConsumerWidget {
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     children: [
-                      const Text('Dikembangkan oleh',
+                      Text('Dikembangkan oleh',
                         style: TextStyle(
                           fontFamily: 'PlusJakartaSans', fontSize: 12,
                           color: AppColors.textLight,
@@ -93,7 +80,7 @@ class TentangScreen extends ConsumerWidget {
                       const SizedBox(height: 4),
                       Text(
                         info?['tim_pengembang'] ?? 'Tim IT GKJW Karangpilang',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'PlusJakartaSans',
                           fontWeight: FontWeight.w600,
                           fontSize: 15,
@@ -108,7 +95,7 @@ class TentangScreen extends ConsumerWidget {
               Text(
                 '© ${DateTime.now().year} GKJW Karangpilang. All rights reserved.',
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'PlusJakartaSans',
                   fontSize: 11,
                   color: AppColors.textLight,

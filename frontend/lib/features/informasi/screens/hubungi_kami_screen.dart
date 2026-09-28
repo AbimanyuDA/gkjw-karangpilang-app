@@ -46,19 +46,19 @@ class HubungiKamiScreen extends ConsumerWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(item.nama, style: const TextStyle(
+                            Text(item.nama, style: TextStyle(
                               fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600,
                               fontSize: 14, color: AppColors.textPrimary,
                             )),
                             const SizedBox(height: 2),
-                            Text(item.nilai, style: const TextStyle(
+                            Text(item.nilai, style: TextStyle(
                               fontFamily: 'PlusJakartaSans', fontSize: 12,
                               color: AppColors.textSecondary,
                             )),
                           ],
                         ),
                       ),
-                      const Icon(Icons.open_in_new, color: AppColors.textLight, size: 20),
+                      Icon(Icons.open_in_new, color: AppColors.textLight, size: 20),
                     ],
                   ),
                 ),

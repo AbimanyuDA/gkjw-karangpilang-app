@@ -55,7 +55,7 @@ class _InspirasiScreenState extends ConsumerState<InspirasiScreen> {
         children: [
           // Toggle kategori
           Container(
-            color: Colors.white,
+            color: AppColors.cardBg,
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             child: Row(
               children: [
@@ -69,7 +69,7 @@ class _InspirasiScreenState extends ConsumerState<InspirasiScreen> {
                       duration: const Duration(milliseconds: 200),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
-                        color: kategori == 'anak' ? AppColors.primary : Colors.grey.shade100,
+                        color: kategori == 'anak' ? AppColors.primary : AppColors.surfaceAlt,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
@@ -99,7 +99,7 @@ class _InspirasiScreenState extends ConsumerState<InspirasiScreen> {
                       duration: const Duration(milliseconds: 200),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
-                        color: kategori == 'dewasa' ? AppColors.primary : Colors.grey.shade100,
+                        color: kategori == 'dewasa' ? AppColors.primary : AppColors.surfaceAlt,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
@@ -175,13 +175,13 @@ class _InspirasiScreenState extends ConsumerState<InspirasiScreen> {
                           margin: const EdgeInsets.symmetric(horizontal: 24),
                           padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
-                            color: AppColors.gold500.withValues(alpha: 0.16),
+                            color: AppColors.tint,
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
                           ),
                           child: Column(
                             children: [
-                              const Text('Challenge Hari Ini! 🎉',
+                              Text('Challenge Hari Ini! 🎉',
                                 style: TextStyle(
                                   fontFamily: 'PlusJakartaSans',
                                   fontWeight: FontWeight.w700,
@@ -193,7 +193,7 @@ class _InspirasiScreenState extends ConsumerState<InspirasiScreen> {
                               Text(
                                 _result!,
                                 textAlign: TextAlign.center,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontFamily: 'PlusJakartaSans',
                                   fontSize: 16,
                                   color: AppColors.textPrimary,

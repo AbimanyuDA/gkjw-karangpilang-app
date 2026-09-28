@@ -44,7 +44,7 @@ curl https://api.domain-anda/healthz
 docker compose exec api /app/api create-admin -email admin@gkjwkarangpilang.org
 ```
 
-Perintah yang sama juga dipakai untuk mengganti password admin.
+Lalu buka **`https://api.domain-anda/admin/`** dan masuk. Password bisa diganti sendiri dari menu akun di website admin; perintah di atas juga bisa dipakai untuk mereset password yang lupa.
 
 ## 5. Pindahkan data lama
 

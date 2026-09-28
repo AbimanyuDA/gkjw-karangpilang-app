@@ -29,14 +29,14 @@ class InformasiGerejaScreen extends ConsumerWidget {
                   width: double.infinity,
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
+                    gradient: LinearGradient(
                       colors: [AppColors.primary, AppColors.primaryDark],
                     ),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Column(
                     children: [
-                      const Icon(Icons.church, color: Colors.white, size: 56),
+                      Image.asset('assets/images/logo.png', width: 64, semanticLabel: 'Logo GKJW Karangpilang'),
                       const SizedBox(height: 12),
                       Text(
                         info['nama'] ?? 'GKJW Karangpilang',
@@ -93,7 +93,7 @@ class InformasiGerejaScreen extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'Kontak',
                           style: TextStyle(
                             fontFamily: 'PlusJakartaSans',
@@ -156,7 +156,7 @@ class _InfoSection extends StatelessWidget {
                   const SizedBox(width: 8),
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'PlusJakartaSans',
                       fontWeight: FontWeight.w700,
                       fontSize: 15,
@@ -168,7 +168,7 @@ class _InfoSection extends StatelessWidget {
               const SizedBox(height: 10),
               Text(
                 content,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'PlusJakartaSans',
                   fontSize: 13,
                   color: AppColors.textSecondary,
@@ -202,7 +202,7 @@ class _ContactRow extends StatelessWidget {
             const SizedBox(width: 12),
             Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'PlusJakartaSans',
                 fontSize: 13,
                 color: AppColors.textPrimary,

@@ -31,7 +31,7 @@ class ProfilListScreen extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.people_outline, size: 64, color: AppColors.textLight),
+                  Icon(Icons.people_outline, size: 64, color: AppColors.textLight),
                   const SizedBox(height: 12),
                   Text('Belum ada data', style: Theme.of(context).textTheme.titleMedium),
                 ],
@@ -51,7 +51,7 @@ class ProfilListScreen extends StatelessWidget {
                         // Avatar
                         CircleAvatar(
                           radius: 36,
-                          backgroundColor: AppColors.gold500.withValues(alpha: 0.16),
+                          backgroundColor: AppColors.tint,
                           backgroundImage: item[fotoKey] != null
                               ? ResizeImage(CachedNetworkImageProvider(item[fotoKey]), width: 150, height: 150)
                               : null,
@@ -60,7 +60,7 @@ class ProfilListScreen extends StatelessWidget {
                                   (item[namaKey] as String).isNotEmpty
                                       ? (item[namaKey] as String)[0].toUpperCase()
                                       : '?',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontFamily: 'PlusJakartaSans',
                                     fontSize: 22,
                                     fontWeight: FontWeight.w700,
@@ -76,7 +76,7 @@ class ProfilListScreen extends StatelessWidget {
                             children: [
                               Text(
                                 item[namaKey] ?? '',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontFamily: 'PlusJakartaSans',
                                   fontWeight: FontWeight.w600,
                                   fontSize: 15,
@@ -87,12 +87,12 @@ class ProfilListScreen extends StatelessWidget {
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                 decoration: BoxDecoration(
-                                  color: AppColors.gold500.withValues(alpha: 0.16),
+                                  color: AppColors.tint,
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: Text(
                                   item[jabatanKey] ?? '',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontFamily: 'PlusJakartaSans',
                                     fontSize: 11,
                                     color: AppColors.primary,
@@ -104,7 +104,7 @@ class ProfilListScreen extends StatelessWidget {
                                 const SizedBox(height: 6),
                                 Text(
                                   item[bioKey],
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontFamily: 'PlusJakartaSans',
                                     fontSize: 12,
                                     color: AppColors.textSecondary,

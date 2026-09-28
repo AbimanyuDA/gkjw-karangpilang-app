@@ -13,7 +13,6 @@ dependencies:
     sdk: flutter
 
   # Backend API & sesi admin
-  flutter_secure_storage: ^9.2.4
 
   # UI & Navigation
   go_router: ^14.8.1
@@ -37,8 +36,6 @@ dependencies:
   shimmer: ^3.0.0
   flutter_spinkit: ^5.2.1
   lottie: ^3.3.1
-  image_picker: ^1.1.2
-  file_picker: ^8.3.7
   permission_handler: ^11.4.0
 
   # Spin Wheel
@@ -50,9 +47,6 @@ dependencies:
   # Icons
   cupertino_icons: ^1.0.8
   flutter_svg: ^2.1.0
-  youtube_explode_dart: ^3.0.5
-  image: ^4.8.0
-  crop_your_image: ^2.0.0
   shared_preferences: ^2.5.5
 
 dev_dependencies:
@@ -111,9 +105,12 @@ flutter_launcher_icons:
 # Layar pertama sebelum Flutter siap: cream + logo, menyatu dengan animasi pembuka.
 flutter_native_splash:
   color: "#F8F2E4"
+  color_dark: "#0A1422"
   image: assets/branding/splash_logo.png
   android_12:
     color: "#F8F2E4"
+    color_dark: "#0A1422"
     image: assets/branding/splash_logo_android12.png
     icon_background_color: "#F8F2E4"
+    icon_background_color_dark: "#0A1422"
   fullscreen: false

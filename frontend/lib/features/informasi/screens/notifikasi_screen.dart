@@ -18,7 +18,7 @@ class NotifikasiScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => const Center(child: Text('Gagal memuat notifikasi')),
         data: (items) => items.isEmpty
-            ? const Center(
+            ? Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -46,26 +46,26 @@ class NotifikasiScreen extends ConsumerWidget {
                               color: AppColors.error.withValues(alpha: 0.1),
                               shape: BoxShape.circle,
                             ),
-                            child: const Icon(Icons.notifications, color: AppColors.error, size: 20),
+                            child: Icon(Icons.notifications, color: AppColors.error, size: 20),
                           ),
                           const SizedBox(width: 14),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(item.judul, style: const TextStyle(
+                                Text(item.judul, style: TextStyle(
                                   fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600,
                                   fontSize: 14, color: AppColors.textPrimary,
                                 )),
                                 const SizedBox(height: 4),
-                                Text(item.pesan, style: const TextStyle(
+                                Text(item.pesan, style: TextStyle(
                                   fontFamily: 'PlusJakartaSans', fontSize: 12,
                                   color: AppColors.textSecondary, height: 1.5,
                                 )),
                                 const SizedBox(height: 6),
                                 Text(
                                   DateFormat('d MMM yyyy, HH:mm', 'id_ID').format(item.createdAt),
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontFamily: 'PlusJakartaSans', fontSize: 11,
                                     color: AppColors.textLight,
                                   ),

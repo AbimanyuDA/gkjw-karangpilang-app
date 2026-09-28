@@ -18,7 +18,7 @@ class ProfilRuanganScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => const Center(child: Text('Gagal memuat data')),
         data: (items) => items.isEmpty
-            ? const Center(
+            ? Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -50,8 +50,8 @@ class ProfilRuanganScreen extends ConsumerWidget {
                         else
                           Container(
                             height: 120,
-                            color: AppColors.gold500.withValues(alpha: 0.16),
-                            child: const Center(
+                            color: AppColors.tint,
+                            child: Center(
                               child: Icon(Icons.meeting_room_outlined,
                                   size: 48, color: AppColors.primary),
                             ),
@@ -63,7 +63,7 @@ class ProfilRuanganScreen extends ConsumerWidget {
                             children: [
                               Text(
                                 item['nama'] ?? '',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontFamily: 'PlusJakartaSans',
                                   fontWeight: FontWeight.w700,
                                   fontSize: 15,
@@ -74,12 +74,12 @@ class ProfilRuanganScreen extends ConsumerWidget {
                                 const SizedBox(height: 4),
                                 Row(
                                   children: [
-                                    const Icon(Icons.people_outline,
+                                    Icon(Icons.people_outline,
                                         size: 15, color: AppColors.textSecondary),
                                     const SizedBox(width: 4),
                                     Text(
                                       'Kapasitas: ${item['kapasitas']} orang',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontFamily: 'PlusJakartaSans',
                                         fontSize: 12,
                                         color: AppColors.textSecondary,
@@ -92,7 +92,7 @@ class ProfilRuanganScreen extends ConsumerWidget {
                                 const SizedBox(height: 6),
                                 Text(
                                   item['deskripsi'],
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontFamily: 'PlusJakartaSans',
                                     fontSize: 12,
                                     color: AppColors.textSecondary,

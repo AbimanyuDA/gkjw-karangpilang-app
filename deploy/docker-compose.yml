@@ -36,7 +36,8 @@ services:
       - uploads:/data/uploads
 
   caddy:
-    image: caddy:2-alpine
+    # Caddy + website admin (/admin/) dibangun dari admin-web/Dockerfile.
+    build: ../admin-web
     restart: unless-stopped
     depends_on:
       - api

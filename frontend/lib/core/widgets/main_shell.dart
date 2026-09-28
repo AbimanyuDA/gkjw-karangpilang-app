@@ -38,19 +38,19 @@ class MainShell extends StatelessWidget {
             right: 0,
             bottom: 0,
             child: Padding(
-              padding: EdgeInsets.only(
-                left: 20,
-                right: 20,
-                bottom: 0 + 18,
-              ),
+              padding: EdgeInsets.only(left: 20, right: 20, bottom: 0 + 18),
               child: _FloatingNavBar(
                 currentIndex: currentIndex,
                 onTap: (index) {
                   switch (index) {
-                    case 0: context.go('/beranda');
-                    case 1: context.go('/siaran');
-                    case 2: context.go('/gereja');
-                    case 3: context.go('/informasi');
+                    case 0:
+                      context.go('/beranda');
+                    case 1:
+                      context.go('/siaran');
+                    case 2:
+                      context.go('/gereja');
+                    case 3:
+                      context.go('/informasi');
                   }
                 },
               ),
@@ -66,7 +66,11 @@ class _NavItem {
   final IconData icon;
   final IconData activeIcon;
   final String label;
-  const _NavItem({required this.icon, required this.activeIcon, required this.label});
+  const _NavItem({
+    required this.icon,
+    required this.activeIcon,
+    required this.label,
+  });
 }
 
 class _FloatingNavBar extends StatelessWidget {
@@ -75,10 +79,26 @@ class _FloatingNavBar extends StatelessWidget {
   const _FloatingNavBar({required this.currentIndex, required this.onTap});
 
   static const _items = [
-    _NavItem(icon: Icons.home_outlined,        activeIcon: Icons.home_rounded,       label: 'Beranda'),
-    _NavItem(icon: Icons.menu_book_outlined,   activeIcon: Icons.menu_book_rounded,  label: 'Siaran'),
-    _NavItem(icon: Icons.church_outlined,      activeIcon: Icons.church_rounded,     label: 'Gereja'),
-    _NavItem(icon: Icons.info_outline_rounded, activeIcon: Icons.info_rounded,       label: 'Informasi'),
+    _NavItem(
+      icon: Icons.home_outlined,
+      activeIcon: Icons.home_rounded,
+      label: 'Beranda',
+    ),
+    _NavItem(
+      icon: Icons.menu_book_outlined,
+      activeIcon: Icons.menu_book_rounded,
+      label: 'Siaran',
+    ),
+    _NavItem(
+      icon: Icons.church_outlined,
+      activeIcon: Icons.church_rounded,
+      label: 'Gereja',
+    ),
+    _NavItem(
+      icon: Icons.info_outline_rounded,
+      activeIcon: Icons.info_rounded,
+      label: 'Informasi',
+    ),
   ];
 
   @override
@@ -108,7 +128,7 @@ class _FloatingNavBar extends StatelessWidget {
           child: Container(
             height: 64,
             decoration: BoxDecoration(
-              color: AppColors.ivory50.withValues(alpha: 0.85),
+              color: AppColors.surface.withValues(alpha: 0.9),
               borderRadius: BorderRadius.circular(28),
               border: Border.all(
                 color: Colors.white.withValues(alpha: 0.6),
@@ -126,10 +146,15 @@ class _FloatingNavBar extends StatelessWidget {
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 250),
                       curve: Curves.easeInOut,
-                      margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 8),
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 5,
+                        vertical: 8,
+                      ),
                       decoration: BoxDecoration(
                         color: isActive
-                            ? AppColors.gold500.withValues(alpha: 0.22)
+                            ? (AppColors.isDark
+                                  ? AppColors.navy700
+                                  : AppColors.gold500.withValues(alpha: 0.22))
                             : Colors.transparent,
                         borderRadius: BorderRadius.circular(20),
                       ),
@@ -138,11 +163,14 @@ class _FloatingNavBar extends StatelessWidget {
                         children: [
                           AnimatedSwitcher(
                             duration: const Duration(milliseconds: 200),
-                            transitionBuilder: (c, a) => ScaleTransition(scale: a, child: c),
+                            transitionBuilder: (c, a) =>
+                                ScaleTransition(scale: a, child: c),
                             child: Icon(
                               isActive ? item.activeIcon : item.icon,
                               key: ValueKey(isActive),
-                              color: isActive ? AppColors.navy900 : AppColors.textLight,
+                              color: isActive
+                                  ? AppColors.heading
+                                  : AppColors.textLight,
                               size: 22,
                             ),
                           ),
@@ -152,8 +180,12 @@ class _FloatingNavBar extends StatelessWidget {
                             style: TextStyle(
                               fontFamily: 'PlusJakartaSans',
                               fontSize: 10,
-                              fontWeight: isActive ? FontWeight.w700 : FontWeight.w600,
-                              color: isActive ? AppColors.navy900 : AppColors.textLight,
+                              fontWeight: isActive
+                                  ? FontWeight.w700
+                                  : FontWeight.w600,
+                              color: isActive
+                                  ? AppColors.heading
+                                  : AppColors.textLight,
                             ),
                             child: Text(item.label),
                           ),

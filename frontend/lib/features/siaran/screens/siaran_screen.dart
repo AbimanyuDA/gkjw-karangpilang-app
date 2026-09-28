@@ -49,7 +49,7 @@ class _SiaranScreenState extends ConsumerState<SiaranScreen> {
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
               child: Row(
                 children: [
-                  const Expanded(
+                  Expanded(
                     child: Text(
                       'Ibadah GKJW Karangpilang',
                       style: TextStyle(
@@ -73,8 +73,8 @@ class _SiaranScreenState extends ConsumerState<SiaranScreen> {
                       ),
                       decoration: BoxDecoration(
                         color: _isCategoryExpanded
-                            ? AppColors.gold500.withValues(alpha: 0.16)
-                            : Colors.grey.shade100,
+                            ? AppColors.tint
+                            : AppColors.surfaceAlt,
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
@@ -100,13 +100,13 @@ class _SiaranScreenState extends ConsumerState<SiaranScreen> {
               child: Container(
                 height: 44,
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
+                  color: AppColors.surfaceAlt,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: TextField(
                   controller: _searchController,
                   style: const TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 13),
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: 'Cari khotbah, judul, tanggal...',
                     hintStyle: TextStyle(
                       fontFamily: 'PlusJakartaSans',
@@ -169,12 +169,12 @@ class _SiaranScreenState extends ConsumerState<SiaranScreen> {
                                 decoration: BoxDecoration(
                                   color: isSelected
                                       ? AppColors.primary
-                                      : Colors.white,
+                                      : AppColors.cardBg,
                                   borderRadius: BorderRadius.circular(20),
                                   border: Border.all(
                                     color: isSelected
                                         ? AppColors.primary
-                                        : Colors.grey.shade300,
+                                        : AppColors.line,
                                     width: 1.5,
                                   ),
                                 ),
@@ -201,8 +201,8 @@ class _SiaranScreenState extends ConsumerState<SiaranScreen> {
             Expanded(
               child: siaranAsync.when(
                 loading: () => Shimmer.fromColors(
-                  baseColor: Colors.grey.shade300,
-                  highlightColor: Colors.grey.shade100,
+                  baseColor: AppColors.surfaceAlt,
+                  highlightColor: AppColors.cardBg,
                   child: ListView.separated(
                     padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
                     itemCount: 4,
@@ -211,7 +211,7 @@ class _SiaranScreenState extends ConsumerState<SiaranScreen> {
                     itemBuilder: (context, index) => Container(
                       height: 200,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: AppColors.cardBg,
                         borderRadius: BorderRadius.circular(16),
                       ),
                     ),
@@ -231,7 +231,7 @@ class _SiaranScreenState extends ConsumerState<SiaranScreen> {
                             .toList();
 
                   return filteredVideos.isEmpty
-                      ? const Center(
+                      ? Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -299,17 +299,17 @@ class _VideoCard extends StatelessWidget {
                   fit: BoxFit.cover,
                   memCacheWidth: 320,
                   placeholder: (context, url) => Shimmer.fromColors(
-                    baseColor: Colors.grey.shade300,
-                    highlightColor: Colors.grey.shade100,
+                    baseColor: AppColors.surfaceAlt,
+                    highlightColor: AppColors.cardBg,
                     child: Container(
                       height: 200,
-                      color: Colors.white,
+                      color: AppColors.cardBg,
                     ),
                   ),
                   errorWidget: (context, url, error) => Container(
                     height: 200,
-                    color: AppColors.gold500.withValues(alpha: 0.16),
-                    child: const Icon(
+                    color: AppColors.tint,
+                    child: Icon(
                       Icons.video_library,
                       size: 64,
                       color: AppColors.primary,
@@ -342,12 +342,12 @@ class _VideoCard extends StatelessWidget {
                     vertical: 3,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.gold500.withValues(alpha: 0.16),
+                    color: AppColors.tint,
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
                     _formatKategori(video.kategori),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'PlusJakartaSans',
                       fontSize: 11,
                       color: AppColors.primary,
@@ -358,7 +358,7 @@ class _VideoCard extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   video.judul,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'PlusJakartaSans',
                     fontWeight: FontWeight.w600,
                     fontSize: 14,
@@ -368,7 +368,7 @@ class _VideoCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   dateStr,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'PlusJakartaSans',
                     fontSize: 12,
                     color: AppColors.textSecondary,

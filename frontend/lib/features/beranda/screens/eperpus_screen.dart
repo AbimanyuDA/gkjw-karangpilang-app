@@ -20,8 +20,8 @@ class EperpusScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('E-Perpustakaan')),
       body: booksAsync.when(
         loading: () => Shimmer.fromColors(
-          baseColor: Colors.grey.shade300,
-          highlightColor: Colors.grey.shade100,
+          baseColor: AppColors.surfaceAlt,
+          highlightColor: AppColors.cardBg,
           child: ListView.separated(
             padding: const EdgeInsets.all(16),
             itemCount: 5,
@@ -29,7 +29,7 @@ class EperpusScreen extends ConsumerWidget {
             itemBuilder: (_, __) => Container(
               height: 110,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.cardBg,
                 borderRadius: BorderRadius.circular(16),
               ),
             ),
@@ -37,7 +37,7 @@ class EperpusScreen extends ConsumerWidget {
         ),
         error: (e, _) => const Center(child: Text('Gagal memuat perpustakaan')),
         data: (books) => books.isEmpty
-            ? const Center(
+            ? Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -117,8 +117,8 @@ class _BookCardState extends State<_BookCard> {
                   : Container(
                       width: 68,
                       height: 90,
-                      color: AppColors.gold500.withValues(alpha: 0.16),
-                      child: const Icon(Icons.book, color: AppColors.primary, size: 32),
+                      color: AppColors.tint,
+                      child: Icon(Icons.book, color: AppColors.primary, size: 32),
                     ),
             ),
             const SizedBox(width: 14),
@@ -128,7 +128,7 @@ class _BookCardState extends State<_BookCard> {
                 children: [
                   Text(
                     widget.book.judul,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'PlusJakartaSans',
                       fontWeight: FontWeight.w600,
                       fontSize: 14,
@@ -141,7 +141,7 @@ class _BookCardState extends State<_BookCard> {
                     const SizedBox(height: 4),
                     Text(
                       widget.book.penulis!,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'PlusJakartaSans',
                         fontSize: 12,
                         color: AppColors.textSecondary,
@@ -151,7 +151,7 @@ class _BookCardState extends State<_BookCard> {
                   if (widget.book.tahun != null)
                     Text(
                       '${widget.book.tahun}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'PlusJakartaSans',
                         fontSize: 11,
                         color: AppColors.textLight,
@@ -170,7 +170,7 @@ class _BookCardState extends State<_BookCard> {
                         const SizedBox(height: 4),
                         Text(
                           'Mengunduh ${(_progress! * 100).toStringAsFixed(0)}%',
-                          style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                          style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
                         ),
                       ],
                     )

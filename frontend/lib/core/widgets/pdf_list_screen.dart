@@ -1,6 +1,7 @@
 // lib/core/widgets/pdf_list_screen.dart
 // Generic reusable screen untuk Warta, Tata Ibadah, Renungan
 import 'package:flutter/material.dart';
+import '../../core/theme/app_theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
@@ -77,7 +78,7 @@ class _PdfListScreenState extends ConsumerState<PdfListScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.error_outline, color: AppColors.error, size: 48),
+              Icon(Icons.error_outline, color: AppColors.error, size: 48),
               const SizedBox(height: 12),
               Text('Gagal memuat data', style: Theme.of(context).textTheme.titleMedium),
             ],
@@ -124,7 +125,7 @@ class _PdfListScreenState extends ConsumerState<PdfListScreen> {
                 width: 56,
                 height: 56,
                 decoration: BoxDecoration(
-                  color: AppColors.gold500.withValues(alpha: 0.16),
+                  color: AppColors.tint,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(widget.icon, color: AppColors.primary, size: 28),
@@ -136,7 +137,7 @@ class _PdfListScreenState extends ConsumerState<PdfListScreen> {
                   children: [
                     Text(
                       item.judul,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'PlusJakartaSans',
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
@@ -146,7 +147,7 @@ class _PdfListScreenState extends ConsumerState<PdfListScreen> {
                     const SizedBox(height: 4),
                     Text(
                       dateStr,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'PlusJakartaSans',
                         fontSize: 12,
                         color: AppColors.textSecondary,
@@ -162,14 +163,14 @@ class _PdfListScreenState extends ConsumerState<PdfListScreen> {
                       ),
                       Text(
                         '${(progress * 100).toStringAsFixed(0)}%',
-                        style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                        style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
                       ),
                     ],
                   ],
                 ),
               ),
               if (progress == null)
-                const Icon(Icons.picture_as_pdf, color: AppColors.error, size: 28),
+                Icon(Icons.picture_as_pdf, color: AppColors.error, size: 28),
             ],
           ),
         ),
@@ -179,8 +180,8 @@ class _PdfListScreenState extends ConsumerState<PdfListScreen> {
 
   Widget _buildShimmer() {
     return Shimmer.fromColors(
-      baseColor: Colors.grey.shade300,
-      highlightColor: Colors.grey.shade100,
+      baseColor: AppColors.surfaceAlt,
+      highlightColor: AppColors.cardBg,
       child: ListView.separated(
         padding: const EdgeInsets.all(16),
         itemCount: 5,
@@ -188,7 +189,7 @@ class _PdfListScreenState extends ConsumerState<PdfListScreen> {
         itemBuilder: (_, __) => Container(
           height: 84,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.cardBg,
             borderRadius: BorderRadius.circular(16),
           ),
         ),

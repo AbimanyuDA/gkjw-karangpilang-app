@@ -65,7 +65,6 @@ class _BerandaScreenState extends ConsumerState<BerandaScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isAdmin = ref.watch(authControllerProvider).isLoggedIn;
     final bannerAsync = ref.watch(bannerSlidesProvider);
 
     return Scaffold(
@@ -94,17 +93,17 @@ class _BerandaScreenState extends ConsumerState<BerandaScreen> {
                         children: [
                           Text(
                             _getGreeting(),
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: AppFonts.display,
-                              color: AppColors.navy900,
+                              color: AppColors.heading,
                               fontSize: 22,
                               height: 1.15,
                               fontWeight: FontWeight.w700,
                             ),
                           ),
                           const SizedBox(height: 2),
-                          const Text(
-                            'Sugeng rawuh di GKJW Karangpilang',
+                          Text(
+                            'Selamat Datang di GKJW Karangpilang',
                             style: TextStyle(
                               fontFamily: AppFonts.body,
                               color: AppColors.accentText,
@@ -113,30 +112,6 @@ class _BerandaScreenState extends ConsumerState<BerandaScreen> {
                             ),
                           ),
                         ],
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    // Admin / lock icon
-                    GestureDetector(
-                      onTap: () => isAdmin
-                          ? context.go('/admin')
-                          : context.go('/login'),
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: AppColors.gold500.withValues(alpha: 0.16),
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: AppColors.primary.withValues(alpha: 0.15),
-                          ),
-                        ),
-                        child: Icon(
-                          isAdmin
-                              ? Icons.admin_panel_settings
-                              : Icons.lock_outline,
-                          color: AppColors.primary,
-                          size: 20,
-                        ),
                       ),
                     ),
                   ],
@@ -184,13 +159,13 @@ class _BerandaScreenState extends ConsumerState<BerandaScreen> {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      const Text(
+                      Text(
                         'Menu Utama',
                         style: TextStyle(
                           fontFamily: AppFonts.display,
                           fontSize: 20,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.navy900,
+                          color: AppColors.heading,
                         ),
                       ),
                     ],
@@ -221,25 +196,25 @@ class _BerandaScreenState extends ConsumerState<BerandaScreen> {
                             _MenuItem(
                               icon: Icons.newspaper,
                               label: 'Warta\nJemaat',
-                              color: const Color(0xFF0B1F3A),
+                              accent: AppColors.navy900,
                               onTap: () => context.go('/beranda/warta'),
                             ),
                             _MenuItem(
                               icon: Icons.book,
                               label: 'Tata\nIbadah',
-                              color: const Color(0xFF1C3A63),
+                              accent: AppColors.navy900,
                               onTap: () => context.go('/beranda/tata-ibadah'),
                             ),
                             _MenuItem(
                               icon: Icons.auto_stories,
                               label: 'Renungan\nYKB',
-                              color: const Color(0xFF8A6420),
+                              accent: AppColors.navy900,
                               onTap: () => context.go('/beranda/renungan'),
                             ),
                             _MenuItem(
                               icon: Icons.calendar_month,
                               label: 'Agenda\nGereja',
-                              color: const Color(0xFFB5842A),
+                              accent: AppColors.navy900,
                               onTap: () => context.go('/beranda/agenda'),
                             ),
                           ],
@@ -251,25 +226,25 @@ class _BerandaScreenState extends ConsumerState<BerandaScreen> {
                             _MenuItem(
                               icon: Icons.photo_library,
                               label: 'Galeri',
-                              color: const Color(0xFF122B4D),
+                              accent: AppColors.navy900,
                               onTap: () => context.go('/beranda/galeri'),
                             ),
                             _MenuItem(
                               icon: Icons.qr_code,
                               label: 'Persembahan',
-                              color: const Color(0xFF8A6420),
+                              accent: AppColors.navy900,
                               onTap: () => context.go('/beranda/persembahan'),
                             ),
                             _MenuItem(
                               icon: Icons.library_books,
                               label: 'E-Perpus',
-                              color: const Color(0xFF1C3A63),
+                              accent: AppColors.navy900,
                               onTap: () => context.go('/beranda/eperpus'),
                             ),
                             _MenuItem(
                               icon: Icons.lightbulb,
                               label: 'Inspirasi',
-                              color: const Color(0xFFB5842A),
+                              accent: AppColors.navy900,
                               onTap: () => context.go('/beranda/inspirasi'),
                             ),
                           ],
@@ -300,7 +275,7 @@ class _BerandaScreenState extends ConsumerState<BerandaScreen> {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      const Text(
+                      Text(
                         'Firman Hari Ini',
                         style: TextStyle(
                           fontFamily: AppFonts.display,
@@ -315,18 +290,27 @@ class _BerandaScreenState extends ConsumerState<BerandaScreen> {
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          AppColors.gold500.withValues(alpha: 0.16),
-                          AppColors.secondary.withValues(alpha: 0.08),
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: AppColors.secondary.withValues(alpha: 0.3),
-                      ),
-                    ),
+                    // Terang: kartu cream-emas. Gelap: kartu navy.
+                    decoration: AppColors.isDark
+                        ? BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [AppColors.navy700, AppColors.navy900],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: AppColors.line),
+                          )
+                        : BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                AppColors.gold500.withValues(alpha: 0.16),
+                                AppColors.gold500.withValues(alpha: 0.08),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: AppColors.gold500.withValues(alpha: 0.3)),
+                          ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -335,31 +319,31 @@ class _BerandaScreenState extends ConsumerState<BerandaScreen> {
                             Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                color: AppColors.secondary.withValues(
+                                color: AppColors.gold500.withValues(
                                   alpha: 0.15,
                                 ),
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              child: const Icon(
+                              child: Icon(
                                 Icons.format_quote,
                                 color: AppColors.secondary,
                                 size: 20,
                               ),
                             ),
                             const SizedBox(width: 10),
-                            const Text(
+                            Text(
                               'Firman Hari Ini',
                               style: TextStyle(
                                 fontFamily: 'PlusJakartaSans',
                                 fontWeight: FontWeight.w600,
-                                color: AppColors.textPrimary,
+                                color: AppColors.heading,
                                 fontSize: 14,
                               ),
                             ),
                           ],
                         ),
                         const SizedBox(height: 12),
-                        const Text(
+                        Text(
                           '"Sebab Aku ini mengetahui rancangan-rancangan apa yang ada pada-Ku mengenai kamu, demikianlah firman TUHAN, yaitu rancangan damai sejahtera dan bukan rancangan kecelakaan, untuk memberikan kepadamu hari depan yang penuh harapan."',
                           style: TextStyle(
                             fontFamily: 'PlusJakartaSans',
@@ -370,14 +354,14 @@ class _BerandaScreenState extends ConsumerState<BerandaScreen> {
                           ),
                         ),
                         const SizedBox(height: 8),
-                        const Align(
+                        Align(
                           alignment: Alignment.centerRight,
                           child: Text(
                             '— Yeremia 29:11',
                             style: TextStyle(
                               fontFamily: 'PlusJakartaSans',
                               fontSize: 12,
-                              color: AppColors.secondary,
+                              color: AppColors.accentText,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -431,7 +415,7 @@ class _BannerCarousel extends StatelessWidget {
                 final banner = banners[index];
                 return Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.cardBg,
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
@@ -448,8 +432,8 @@ class _BannerCarousel extends StatelessWidget {
                       fit: BoxFit.cover,
                       memCacheWidth: 800,
                       placeholder: (context, url) => Container(
-                        color: AppColors.gold500.withValues(alpha: 0.16),
-                        child: const Center(
+                        color: AppColors.tint,
+                        child: Center(
                           child: CircularProgressIndicator(
                             color: AppColors.secondary,
                             strokeWidth: 2,
@@ -457,8 +441,8 @@ class _BannerCarousel extends StatelessWidget {
                         ),
                       ),
                       errorWidget: (context, url, error) => Container(
-                        color: AppColors.gold500.withValues(alpha: 0.16),
-                        child: const Center(
+                        color: AppColors.tint,
+                        child: Center(
                           child: Icon(
                             Icons.image_not_supported_outlined,
                             color: AppColors.textLight,
@@ -497,7 +481,7 @@ class _BannerCarousel extends StatelessWidget {
             const SizedBox(width: 8),
             Text(
               '${currentIndex + 1}/${banners.length}',
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'PlusJakartaSans',
                 fontSize: 11,
                 color: AppColors.textLight,
@@ -521,7 +505,7 @@ class _BannerPlaceholder extends StatelessWidget {
         aspectRatio: 16 / 9,
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.cardBg,
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
@@ -534,8 +518,8 @@ class _BannerPlaceholder extends StatelessWidget {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(16),
             child: Container(
-              color: AppColors.gold500.withValues(alpha: 0.16),
-              child: const Center(
+              color: AppColors.tint,
+              child: Center(
                 child: CircularProgressIndicator(
                   color: AppColors.secondary,
                   strokeWidth: 2,
@@ -553,13 +537,13 @@ class _BannerPlaceholder extends StatelessWidget {
 class _MenuItem extends StatelessWidget {
   final IconData icon;
   final String label;
-  final Color color;
+  final Color accent; // warna ikon di tema terang
   final VoidCallback onTap;
 
   const _MenuItem({
     required this.icon,
     required this.label,
-    required this.color,
+    required this.accent,
     required this.onTap,
   });
 
@@ -573,17 +557,28 @@ class _MenuItem extends StatelessWidget {
           Container(
             width: 58,
             height: 58,
-            decoration: BoxDecoration(
-              color: AppColors.background, // tile cream, ikon navy/emas
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: color.withValues(alpha: 0.28), width: 1),
-            ),
-            child: Icon(icon, color: color, size: 26),
+            // Terang: tile cream + ikon navy/emas. Gelap: tile biru navy + ikon cream.
+            decoration: AppColors.isDark
+                ? BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [AppColors.navy700, AppColors.navy800],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: AppColors.line),
+                  )
+                : BoxDecoration(
+                    color: AppColors.background,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: accent.withValues(alpha: 0.28)),
+                  ),
+            child: Icon(icon, color: AppColors.isDark ? AppColors.ivory50 : accent, size: 26),
           ),
           const SizedBox(height: 6),
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'PlusJakartaSans',
               fontSize: 10,
               fontWeight: FontWeight.w500,
