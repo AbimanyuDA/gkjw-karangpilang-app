@@ -63,6 +63,9 @@ class GerejaScreen extends ConsumerWidget {
           final covers = {
             for (final c in ref.watch(gerejaCoversProvider).value ?? const [])
               c.key: c.imageUrl,
+            // Cover kartu Informasi Gereja diatur di menu admin "Informasi Gereja".
+            'informasi_gereja':
+                ref.watch(informasiGerejaProvider).value?['cover_foto'] as String? ?? '',
           };
 
           return CustomScrollView(

@@ -16,7 +16,7 @@ class ProfilBagianScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final info =
         ref.watch(informasiGerejaProvider).value ?? const <String, dynamic>{};
-    final judul = bagian.judul(namaGereja(info));
+    final judul = bagian.judul;
     final isi = bagian.isi(info);
 
     return Scaffold(
