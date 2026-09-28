@@ -78,5 +78,5 @@ Di website admin, cukup tempel link video: judul, deskripsi, dan tanggal terisi 
 ## Dokumentasi
 
 - [docs/DEPLOY.md](docs/DEPLOY.md): memasang di VPS IDCloudHost dari nol
-- [docs/MIGRASI-DATA.md](docs/MIGRASI-DATA.md): memindahkan data lama dari Supabase & Firestore
+- [docs/MIGRASI-DATA.md](docs/MIGRASI-DATA.md): memindahkan data lama dari Firestore
 - [docs/API.md](docs/API.md): daftar endpoint

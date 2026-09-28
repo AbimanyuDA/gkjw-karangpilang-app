@@ -7,7 +7,7 @@
 //	api create-admin -email X   buat admin / ganti password (password dari
 //	                            env ADMIN_PASSWORD atau stdin)
 //	api migrate-legacy [-dry-run]
-//	                            salin data lama Supabase + Firestore (sekali saja)
+//	                            salin data lama dari Firestore (sekali saja)
 package main
 
 import (
@@ -83,7 +83,7 @@ func run(ctx context.Context, args []string) error {
 	case "create-admin":
 		return createAdmin(ctx, auth.NewPgAdminStore(pool), args[1:], os.Stdin)
 	case "migrate-legacy":
-		return migrateLegacy(ctx, cfg, pool, args[1:])
+		return migrateLegacy(ctx, pool, args[1:])
 	default:
 		return fmt.Errorf("perintah tidak dikenal: %q", cmd)
 	}
@@ -159,7 +159,7 @@ func healthcheck(ctx context.Context) error {
 	return nil
 }
 
-func migrateLegacy(ctx context.Context, cfg config.Config, pool *pgxpool.Pool, args []string) error {
+func migrateLegacy(ctx context.Context, pool *pgxpool.Pool, args []string) error {
 	fs := flag.NewFlagSet("migrate-legacy", flag.ContinueOnError)
 	dryRun := fs.Bool("dry-run", false, "baca & validasi saja, tanpa menulis")
 	if err := fs.Parse(args); err != nil {
@@ -167,25 +167,21 @@ func migrateLegacy(ctx context.Context, cfg config.Config, pool *pgxpool.Pool, a
 	}
 
 	env := map[string]string{}
-	for _, key := range []string{"LEGACY_SUPABASE_URL", "LEGACY_SUPABASE_ANON_KEY", "LEGACY_FIREBASE_PROJECT_ID", "LEGACY_FIREBASE_API_KEY"} {
+	for _, key := range []string{"LEGACY_FIREBASE_PROJECT_ID", "LEGACY_FIREBASE_API_KEY"} {
 		env[key] = os.Getenv(key)
 		if env[key] == "" {
 			return fmt.Errorf("env %s wajib diisi (lihat docs/MIGRASI-DATA.md)", key)
 		}
 	}
 
-	storage, err := upload.NewStorage(cfg.UploadDir, cfg.PublicBaseURL)
-	if err != nil {
-		return err
-	}
-	httpClient := &http.Client{Timeout: 2 * time.Minute}
 	m := &legacy.Migrator{
-		Pool:      pool,
-		Supabase:  legacy.SupabaseSource{BaseURL: env["LEGACY_SUPABASE_URL"], AnonKey: env["LEGACY_SUPABASE_ANON_KEY"], Client: httpClient},
-		Firestore: legacy.FirestoreSource{ProjectID: env["LEGACY_FIREBASE_PROJECT_ID"], APIKey: env["LEGACY_FIREBASE_API_KEY"], Client: httpClient},
-		Files:     storage,
-		HTTP:      httpClient,
-		DryRun:    *dryRun,
+		Pool: pool,
+		Firestore: legacy.FirestoreSource{
+			ProjectID: env["LEGACY_FIREBASE_PROJECT_ID"],
+			APIKey:    env["LEGACY_FIREBASE_API_KEY"],
+			Client:    &http.Client{Timeout: 2 * time.Minute},
+		},
+		DryRun: *dryRun,
 	}
 	reports, err := m.Run(ctx)
 	for _, r := range reports {

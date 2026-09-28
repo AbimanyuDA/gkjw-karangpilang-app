@@ -1,4 +1,4 @@
-// Package legacy memindahkan data lama dari Supabase & Firestore ke PostgreSQL baru.
+// Package legacy memindahkan data lama dari Firestore (aplikasi versi lama) ke PostgreSQL baru.
 // Dipakai sekali saat migrasi: `api migrate-legacy` (lihat docs/MIGRASI-DATA.md).
 package legacy
 
@@ -15,30 +15,6 @@ import (
 
 // maxResponseBytes membatasi ukuran respons JSON dari sumber lama.
 const maxResponseBytes = 50 << 20
-
-// SupabaseSource membaca tabel lewat REST API Supabase (PostgREST) memakai anon key.
-type SupabaseSource struct {
-	BaseURL string // https://xxxx.supabase.co
-	AnonKey string
-	Client  *http.Client
-}
-
-// Fetch mengambil semua baris sebuah tabel.
-func (s SupabaseSource) Fetch(ctx context.Context, table string) ([]map[string]any, error) {
-	endpoint := strings.TrimRight(s.BaseURL, "/") + "/rest/v1/" + url.PathEscape(table) + "?select=*"
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("apikey", s.AnonKey)
-	req.Header.Set("Authorization", "Bearer "+s.AnonKey)
-
-	var rows []map[string]any
-	if err := getJSON(s.Client, req, &rows); err != nil {
-		return nil, fmt.Errorf("supabase %s: %w", table, err)
-	}
-	return rows, nil
-}
 
 // FirestoreSource membaca koleksi lewat REST API Firestore memakai API key publik.
 type FirestoreSource struct {

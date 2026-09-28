@@ -1,5 +1,5 @@
 // lib/data/services/content_service.dart
-// Satu pintu baca konten dari backend GKJW (menggantikan SupabaseService & FirestoreService).
+// Satu pintu baca konten dari backend GKJW.
 // Aplikasi hanya membaca; konten dikelola lewat website admin (folder admin-web/).
 import '../api/api_client.dart';
 import '../models/content_models.dart';
