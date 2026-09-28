@@ -1,17 +1,17 @@
 // lib/providers/providers.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../core/theme/theme_controller.dart';
 import '../data/api/api_client.dart';
 import '../data/models/content_models.dart';
 import '../data/models/pdf_item_model.dart';
-import '../data/services/auth_controller.dart';
 import '../data/services/content_service.dart';
 
 // ── Infrastruktur (di-override di main.dart) ─────────────────────
-final authControllerProvider = Provider<AuthController>(
-    (ref) => throw UnimplementedError('override authControllerProvider di main.dart'));
-
 final apiClientProvider = Provider<ApiClient>(
     (ref) => throw UnimplementedError('override apiClientProvider di main.dart'));
+
+final themeControllerProvider = Provider<ThemeController>(
+    (ref) => throw UnimplementedError('override themeControllerProvider di main.dart'));
 
 final contentServiceProvider =
     Provider<ContentService>((ref) => ContentService(ref.watch(apiClientProvider)));

@@ -79,12 +79,12 @@ class _SiaranDetailScreenState extends State<SiaranDetailScreen> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: AppColors.gold500.withValues(alpha: 0.16),
+                          color: AppColors.tint,
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
                           _formatKategori(widget.video.kategori),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontFamily: 'PlusJakartaSans',
                             fontSize: 12,
                             color: AppColors.primary,
@@ -97,7 +97,7 @@ class _SiaranDetailScreenState extends State<SiaranDetailScreen> {
                       // Judul
                       Text(
                         widget.video.judul,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'PlusJakartaSans',
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
@@ -109,11 +109,11 @@ class _SiaranDetailScreenState extends State<SiaranDetailScreen> {
                       // Tanggal
                       Row(
                         children: [
-                          const Icon(Icons.calendar_today, size: 14, color: AppColors.textSecondary),
+                          Icon(Icons.calendar_today, size: 14, color: AppColors.textSecondary),
                           const SizedBox(width: 6),
                           Text(
                             dateStr,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'PlusJakartaSans',
                               fontSize: 13,
                               color: AppColors.textSecondary,
@@ -124,7 +124,7 @@ class _SiaranDetailScreenState extends State<SiaranDetailScreen> {
                       const SizedBox(height: 24),
 
                       // Deskripsi
-                      const Text(
+                      Text(
                         'Deskripsi',
                         style: TextStyle(
                           fontFamily: 'PlusJakartaSans',
@@ -137,7 +137,7 @@ class _SiaranDetailScreenState extends State<SiaranDetailScreen> {
                       if (deskripsi.isNotEmpty)
                         SelectableText(
                           deskripsi,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontFamily: 'PlusJakartaSans',
                             fontSize: 14,
                             height: 1.6,
@@ -145,7 +145,7 @@ class _SiaranDetailScreenState extends State<SiaranDetailScreen> {
                           ),
                         )
                       else
-                        const Text(
+                        Text(
                           'Tidak ada deskripsi tersedia.',
                           style: TextStyle(
                             fontFamily: 'PlusJakartaSans',

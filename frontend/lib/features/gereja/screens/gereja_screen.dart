@@ -9,48 +9,48 @@ import '../../../providers/providers.dart';
 class GerejaScreen extends ConsumerWidget {
   const GerejaScreen({super.key});
 
-  static const _menuItems = [
+  static const _menuItems = [ // latar kartu: navy/emas tetap di kedua tema
     _GerejaMenuItem(
       key: 'informasi_gereja',
       title: 'Informasi Gereja',
       subtitle: 'Profil, visi, dan misi gereja',
       route: '/gereja/informasi',
-      accentColor: Color(0xFF1C3A63),
+      accentColor: AppColors.navy700,
     ),
     _GerejaMenuItem(
       key: 'kependetaan',
       title: 'Kependetaan',
       subtitle: 'Profil gembala sidang',
       route: '/gereja/kependetaan',
-      accentColor: Color(0xFF0B1F3A),
+      accentColor: AppColors.navy900,
     ),
     _GerejaMenuItem(
       key: 'kemajelisan',
       title: 'Kemajelisan',
       subtitle: 'Profil majelis jemaat',
       route: '/gereja/kemajelisan',
-      accentColor: Color(0xFF8A6420),
+      accentColor: AppColors.gold700,
     ),
     _GerejaMenuItem(
       key: 'bpm',
       title: 'Badan Pembantu Majelis',
       subtitle: 'Komisi-komisi di gereja',
       route: '/gereja/bpm',
-      accentColor: Color(0xFFB5842A),
+      accentColor: AppColors.gold600,
     ),
     _GerejaMenuItem(
       key: 'perwilayahan',
       title: 'Perwilayahan',
       subtitle: 'Data wilayah jemaat',
       route: '/gereja/perwilayahan',
-      accentColor: Color(0xFF122B4D),
+      accentColor: AppColors.navy800,
     ),
     _GerejaMenuItem(
       key: 'profil_ruangan',
       title: 'Profil Ruangan',
       subtitle: 'Fasilitas ruangan gereja',
       route: '/gereja/profil-ruangan',
-      accentColor: Color(0xFF1C3A63),
+      accentColor: AppColors.navy700,
     ),
   ];
 
@@ -75,13 +75,13 @@ class GerejaScreen extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'GKJW Karangpilang',
                           style: TextStyle(
                             fontFamily: AppFonts.display,
                             fontSize: 30,
                             fontWeight: FontWeight.w700,
-                            color: AppColors.navy900,
+                            color: AppColors.heading,
                             letterSpacing: -0.3,
                             height: 1.2,
                           ),
@@ -92,7 +92,7 @@ class GerejaScreen extends ConsumerWidget {
                           style: TextStyle(
                             fontFamily: 'PlusJakartaSans',
                             fontSize: 14,
-                            color: Colors.grey.shade600,
+                            color: AppColors.textSecondary,
                           ),
                         ),
                         const SizedBox(height: 20),
@@ -198,14 +198,14 @@ class _GerejaCoverCard extends StatelessWidget {
                   children: [
                     Text(
                       item.title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'PlusJakartaSans',
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
                         shadows: [
                           Shadow(
-                            color: Colors.black54,
+                            color: AppColors.textSecondary,
                             blurRadius: 8,
                           ),
                         ],

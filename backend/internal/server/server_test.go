@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"net/http"
 	"net/http/httptest"
@@ -12,6 +13,7 @@ import (
 	"github.com/AbimanyuDA/gkjw-karangpilang-app/backend/internal/auth"
 	"github.com/AbimanyuDA/gkjw-karangpilang-app/backend/internal/resource"
 	"github.com/AbimanyuDA/gkjw-karangpilang-app/backend/internal/upload"
+	"github.com/AbimanyuDA/gkjw-karangpilang-app/backend/internal/youtube"
 )
 
 type pinger struct{ err error }
@@ -22,6 +24,16 @@ type noAdmins struct{}
 
 func (noAdmins) FindByEmail(context.Context, string) (auth.Admin, error) {
 	return auth.Admin{}, auth.ErrAdminNotFound
+}
+func (noAdmins) FindByID(context.Context, string) (auth.Admin, error) {
+	return auth.Admin{}, auth.ErrAdminNotFound
+}
+func (noAdmins) SetPassword(context.Context, string, string) error { return auth.ErrAdminNotFound }
+
+type fakeYT struct{}
+
+func (fakeYT) Fetch(_ context.Context, id string) (youtube.Metadata, error) {
+	return youtube.Metadata{VideoID: id, Title: "Ibadah"}, nil
 }
 
 type emptyRepo struct{ resource.Repository }
@@ -42,6 +54,7 @@ func newTestRouter(t *testing.T, db Pinger, trustProxy bool) (http.Handler, *aut
 		Repo:       emptyRepo{},
 		Auth:       auth.NewHandler(noAdmins{}, tokens),
 		Uploads:    upload.NewHandler(st),
+		YouTube:    fakeYT{},
 		TrustProxy: trustProxy,
 	}), tokens
 }
@@ -86,6 +99,9 @@ func TestAdminRoutesRequireToken(t *testing.T) {
 		{"PUT", "/api/v1/admin/sapaan-config"},
 		{"POST", "/api/v1/admin/uploads?bucket=banners"},
 		{"GET", "/api/v1/auth/me"},
+		{"GET", "/api/v1/admin/schema"},
+		{"GET", "/api/v1/admin/youtube?url=dQw4w9WgXcQ"},
+		{"PUT", "/api/v1/auth/password"},
 	} {
 		rec := serve(h, httptest.NewRequest(tc.method, tc.path, nil))
 		if rec.Code != http.StatusUnauthorized {
@@ -143,5 +159,57 @@ func TestUnknownRouteIsJSON404(t *testing.T) {
 	rec := serve(h, httptest.NewRequest("GET", "/nope", nil))
 	if rec.Code != http.StatusNotFound || !strings.Contains(rec.Body.String(), `"not_found"`) {
 		t.Errorf("status = %d body = %s", rec.Code, rec.Body)
+	}
+}
+
+func adminGet(t *testing.T, h http.Handler, tokens *auth.Tokens, path string) *httptest.ResponseRecorder {
+	t.Helper()
+	token, _, _ := tokens.Issue("a1", "admin@gkjw.org")
+	req := httptest.NewRequest("GET", path, nil)
+	req.Header.Set("Authorization", "Bearer "+token)
+	return serve(h, req)
+}
+
+func TestAdminSchema(t *testing.T) {
+	h, tokens := newTestRouter(t, pinger{}, false)
+	rec := adminGet(t, h, tokens, "/api/v1/admin/schema")
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status = %d", rec.Code)
+	}
+	var body struct {
+		Data adminSchema `json:"data"`
+	}
+	if err := json.Unmarshal(rec.Body.Bytes(), &body); err != nil {
+		t.Fatal(err)
+	}
+	if len(body.Data.Resources) != len(resource.All) {
+		t.Errorf("resources = %d, want %d", len(body.Data.Resources), len(resource.All))
+	}
+	// Setiap field upload harus menunjuk bucket yang benar-benar ada.
+	for _, r := range body.Data.Resources {
+		for _, f := range r.Fields {
+			if f.Upload == "" {
+				continue
+			}
+			b, ok := body.Data.Buckets[f.Upload]
+			if !ok {
+				t.Errorf("%s.%s: bucket %q tidak ada", r.Path, f.Name, f.Upload)
+				continue
+			}
+			if (f.Input == resource.InputPDF) != (b.Kind == "pdf") {
+				t.Errorf("%s.%s: input %s tidak cocok dengan bucket %s", r.Path, f.Name, f.Input, b.Kind)
+			}
+		}
+	}
+}
+
+func TestAdminYouTube(t *testing.T) {
+	h, tokens := newTestRouter(t, pinger{}, false)
+	if rec := adminGet(t, h, tokens, "/api/v1/admin/youtube?url=https://youtu.be/dQw4w9WgXcQ"); rec.Code != http.StatusOK ||
+		!strings.Contains(rec.Body.String(), `"youtube_id":"dQw4w9WgXcQ"`) {
+		t.Errorf("status = %d body = %s", rec.Code, rec.Body)
+	}
+	if rec := adminGet(t, h, tokens, "/api/v1/admin/youtube?url=bukan-link"); rec.Code != http.StatusBadRequest {
+		t.Errorf("invalid link: status = %d", rec.Code)
 	}
 }

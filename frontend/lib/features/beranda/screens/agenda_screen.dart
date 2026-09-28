@@ -18,8 +18,8 @@ class AgendaScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Agenda Jemaat')),
       body: agendaAsync.when(
         loading: () => Shimmer.fromColors(
-          baseColor: Colors.grey.shade300,
-          highlightColor: Colors.grey.shade100,
+          baseColor: AppColors.surfaceAlt,
+          highlightColor: AppColors.cardBg,
           child: ListView.separated(
             padding: const EdgeInsets.all(16),
             itemCount: 5,
@@ -27,7 +27,7 @@ class AgendaScreen extends ConsumerWidget {
             itemBuilder: (_, __) => Container(
               height: 100,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.cardBg,
                 borderRadius: BorderRadius.circular(16),
               ),
             ),
@@ -35,7 +35,7 @@ class AgendaScreen extends ConsumerWidget {
         ),
         error: (e, _) => const Center(child: Text('Gagal memuat agenda')),
         data: (items) => items.isEmpty
-            ? const Center(
+            ? Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -67,7 +67,7 @@ class _AgendaCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isUpcoming =
         item.tanggal.isAfter(DateTime.now().subtract(const Duration(days: 1)));
-    final cardColor = isUpcoming ? AppColors.primary : Colors.grey.shade400;
+    final cardColor = isUpcoming ? AppColors.primary : AppColors.textLight;
 
     return Card(
       child: Padding(
@@ -115,7 +115,7 @@ class _AgendaCard extends StatelessWidget {
                 children: [
                   Text(
                     item.judul,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'PlusJakartaSans',
                       fontWeight: FontWeight.w600,
                       fontSize: 14,
@@ -127,12 +127,12 @@ class _AgendaCard extends StatelessWidget {
                   if (item.tanggal.hour != 0 || item.tanggal.minute != 0)
                     Row(
                       children: [
-                        const Icon(Icons.access_time,
+                        Icon(Icons.access_time,
                             size: 13, color: AppColors.textSecondary),
                         const SizedBox(width: 4),
                         Text(
                           DateFormat('HH:mm').format(item.tanggal),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontFamily: 'PlusJakartaSans',
                             fontSize: 12,
                             color: AppColors.textSecondary,
@@ -145,13 +145,13 @@ class _AgendaCard extends StatelessWidget {
                     const SizedBox(height: 2),
                     Row(
                       children: [
-                        const Icon(Icons.location_on_outlined,
+                        Icon(Icons.location_on_outlined,
                             size: 13, color: AppColors.textSecondary),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
                             item.lokasi!,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'PlusJakartaSans',
                               fontSize: 12,
                               color: AppColors.textSecondary,
@@ -167,7 +167,7 @@ class _AgendaCard extends StatelessWidget {
                     const SizedBox(height: 6),
                     Text(
                       item.deskripsi!,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'PlusJakartaSans',
                         fontSize: 12,
                         color: AppColors.textSecondary,
@@ -183,10 +183,10 @@ class _AgendaCard extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
-                        color: AppColors.gold500.withValues(alpha: 0.16),
+                        color: AppColors.tint,
                         borderRadius: BorderRadius.circular(6),
                       ),
-                      child: const Text(
+                      child: Text(
                         'Akan Datang',
                         style: TextStyle(
                           fontFamily: 'PlusJakartaSans',

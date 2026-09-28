@@ -1,7 +1,9 @@
 // lib/features/informasi/screens/informasi_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../providers/providers.dart';
 
 class InformasiScreen extends StatefulWidget {
   const InformasiScreen({super.key});
@@ -23,13 +25,13 @@ class _InformasiScreenState extends State<InformasiScreen> {
         elevation: 0,
         backgroundColor: AppColors.background,
         centerTitle: true,
-        title: const Text(
+        title: Text(
           'Pengaturan',
           style: TextStyle(
             fontFamily: AppFonts.display,
             fontSize: 20,
             fontWeight: FontWeight.w700,
-            color: AppColors.navy900,
+            color: AppColors.heading,
           ),
         ),
       ),
@@ -44,31 +46,24 @@ class _InformasiScreenState extends State<InformasiScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Container(
-                        width: 80,
-                        height: 80,
-                        decoration: BoxDecoration(
-                          color: AppColors.secondary.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Image.asset(
-                          'assets/images/logo.png',
-                          width: 56,
-                          semanticLabel: 'Logo GKJW Karangpilang',
-                        ),
+                      // Logo polos, tanpa latar
+                      Image.asset(
+                        'assets/images/logo.png',
+                        width: 96,
+                        semanticLabel: 'Logo GKJW Karangpilang',
                       ),
                       const SizedBox(height: 16),
-                      const Text(
+                      Text(
                         'GKJW Karangpilang+',
                         style: TextStyle(
                           fontFamily: AppFonts.display,
                           fontSize: 22,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.navy900,
+                          color: AppColors.heading,
                         ),
                       ),
                       const SizedBox(height: 4),
-                      const Text(
+                      Text(
                         'Versi 1.0',
                         style: TextStyle(
                           fontFamily: 'PlusJakartaSans',
@@ -76,6 +71,8 @@ class _InformasiScreenState extends State<InformasiScreen> {
                           color: AppColors.textSecondary,
                         ),
                       ),
+                      const SizedBox(height: 20),
+                      const _ThemePicker(),
                       const SizedBox(height: 24),
                     ],
                   ),
@@ -93,7 +90,7 @@ class _InformasiScreenState extends State<InformasiScreen> {
                 const SizedBox(height: 12),
                 Card(
                   elevation: 0,
-                  color: Colors.white,
+                  color: AppColors.cardBg,
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(
@@ -115,7 +112,7 @@ class _InformasiScreenState extends State<InformasiScreen> {
                           onChanged: (value) {
                             setState(() => notificationEvening = value);
                           },
-                          color: const Color(0xFF1C3A63),
+                          color: AppColors.primary,
                         ),
                         const Divider(height: 24),
                         _NotificationToggle(
@@ -125,9 +122,9 @@ class _InformasiScreenState extends State<InformasiScreen> {
                           onChanged: (value) {
                             setState(() => notificationChurch = value);
                           },
-                          color: const Color(0xFF8A6420),
+                          color: AppColors.accentText,
                         ),
-                        const Divider(height: 24),
+                        Divider(height: 24),
                         _NotificationToggle(
                           icon: Icons.notifications,
                           title: 'Riwayat Notifikasi',
@@ -143,33 +140,33 @@ class _InformasiScreenState extends State<InformasiScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: 24),
 
                 // HUBUNGI KAMI Section
-                const _SectionHeader(title: 'HUBUNGI KAMI'),
-                const SizedBox(height: 12),
+                _SectionHeader(title: 'HUBUNGI KAMI'),
+                SizedBox(height: 12),
                 Card(
                   elevation: 0,
-                  color: Colors.white,
+                  color: AppColors.cardBg,
                   child: Padding(
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.all(16),
                     child: Column(
                       children: [
                         _ContactItem(
                           icon: Icons.phone,
                           title: 'WhatsApp Admin',
                           onTap: () {},
-                          color: const Color(0xFF25D366),
+                          color: Color(0xFF25D366),
                         ),
-                        const Divider(height: 20),
+                        Divider(height: 20),
                         _ContactItem(
                           icon: Icons.email,
                           title: 'Email Sekretariat',
                           subtitle: 'info.gkisalatiga@gmail.com',
                           onTap: () {},
-                          color: const Color(0xFFEA4335),
+                          color: Color(0xFFEA4335),
                         ),
-                        const Divider(height: 20),
+                        Divider(height: 20),
                         _ContactItem(
                           icon: Icons.location_on_outlined,
                           title: 'Lokasi Gereja',
@@ -182,32 +179,32 @@ class _InformasiScreenState extends State<InformasiScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: 24),
 
                 // TENTANG APLIKASI Section
-                const _SectionHeader(title: 'TENTANG APLIKASI'),
-                const SizedBox(height: 12),
+                _SectionHeader(title: 'TENTANG APLIKASI'),
+                SizedBox(height: 12),
                 Card(
                   elevation: 0,
-                  color: Colors.white,
+                  color: AppColors.cardBg,
                   child: Padding(
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.all(16),
                     child: Column(
                       children: [
                         _AboutItem(
                           icon: Icons.description,
                           title: 'Catatan Perubahan',
                           onTap: () {},
-                          color: const Color(0xFF122B4D),
+                          color: AppColors.primary,
                         ),
-                        const Divider(height: 20),
+                        Divider(height: 20),
                         _AboutItem(
                           icon: Icons.code,
                           title: 'Kode Sumber (GitHub)',
                           onTap: () {},
-                          color: const Color(0xFF122B4D),
+                          color: AppColors.primary,
                         ),
-                        const Divider(height: 20),
+                        Divider(height: 20),
                         _AboutItem(
                           icon: Icons.build,
                           title: 'Hubungi Pengembang',
@@ -219,7 +216,7 @@ class _InformasiScreenState extends State<InformasiScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
               ]),
             ),
           ),
@@ -239,7 +236,7 @@ class _SectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       title,
-      style: const TextStyle(
+      style: TextStyle(
         fontFamily: 'PlusJakartaSans',
         fontSize: 13,
         fontWeight: FontWeight.w700,
@@ -260,15 +257,15 @@ class _NotificationToggle extends StatelessWidget {
   final VoidCallback? onTap;
   final Color color;
 
-  const _NotificationToggle({
+  _NotificationToggle({
     required this.icon,
     required this.title,
     required this.value,
     required this.onChanged,
     this.hasArrow = false,
     this.onTap,
-    this.color = AppColors.secondary,
-  });
+    Color? color,
+  }) : color = color ?? AppColors.secondary; // warna aksen tema aktif
 
   @override
   Widget build(BuildContext context) {
@@ -283,20 +280,20 @@ class _NotificationToggle extends StatelessWidget {
           ),
           child: Icon(icon, size: 20, color: color),
         ),
-        const SizedBox(width: 12),
+        SizedBox(width: 12),
         Expanded(
           child: Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'PlusJakartaSans',
               fontSize: 14,
               fontWeight: FontWeight.w500,
-              color: Colors.black87,
+              color: AppColors.textPrimary,
             ),
           ),
         ),
         if (hasArrow)
-          const Icon(Icons.chevron_right, color: Colors.grey, size: 20)
+          Icon(Icons.chevron_right, color: AppColors.textLight, size: 20)
         else
           Transform.scale(
             scale: 0.8,
@@ -304,7 +301,7 @@ class _NotificationToggle extends StatelessWidget {
               value: value,
               onChanged: onChanged,
               activeColor: AppColors.primary,
-              inactiveTrackColor: Colors.grey[300],
+              inactiveTrackColor: AppColors.surfaceAlt,
             ),
           ),
       ],
@@ -320,13 +317,13 @@ class _ContactItem extends StatelessWidget {
   final VoidCallback onTap;
   final Color color;
 
-  const _ContactItem({
+  _ContactItem({
     required this.icon,
     required this.title,
     this.subtitle,
     required this.onTap,
-    this.color = AppColors.secondary,
-  });
+    Color? color,
+  }) : color = color ?? AppColors.secondary; // warna aksen tema aktif
 
   @override
   Widget build(BuildContext context) {
@@ -343,29 +340,29 @@ class _ContactItem extends StatelessWidget {
             ),
             child: Icon(icon, size: 20, color: color),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'PlusJakartaSans',
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
-                    color: Colors.black87,
+                    color: AppColors.textPrimary,
                   ),
                 ),
                 if (subtitle != null)
                   Padding(
-                    padding: const EdgeInsets.only(top: 2),
+                    padding: EdgeInsets.only(top: 2),
                     child: Text(
                       subtitle!,
                       style: TextStyle(
                         fontFamily: 'PlusJakartaSans',
                         fontSize: 12,
-                        color: Colors.grey[600],
+                        color: AppColors.textSecondary,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -374,7 +371,7 @@ class _ContactItem extends StatelessWidget {
               ],
             ),
           ),
-          const Icon(Icons.chevron_right, color: Colors.grey, size: 20),
+          Icon(Icons.chevron_right, color: AppColors.textLight, size: 20),
         ],
       ),
     );
@@ -389,13 +386,13 @@ class _AboutItem extends StatelessWidget {
   final VoidCallback onTap;
   final Color color;
 
-  const _AboutItem({
+  _AboutItem({
     required this.icon,
     required this.title,
     this.subtitle,
     required this.onTap,
-    this.color = AppColors.secondary,
-  });
+    Color? color,
+  }) : color = color ?? AppColors.secondary; // warna aksen tema aktif
 
   @override
   Widget build(BuildContext context) {
@@ -419,11 +416,11 @@ class _AboutItem extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'PlusJakartaSans',
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
-                    color: Colors.black87,
+                    color: AppColors.textPrimary,
                   ),
                 ),
                 if (subtitle != null)
@@ -434,7 +431,7 @@ class _AboutItem extends StatelessWidget {
                       style: TextStyle(
                         fontFamily: 'PlusJakartaSans',
                         fontSize: 12,
-                        color: Colors.grey[600],
+                        color: AppColors.textSecondary,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -443,8 +440,106 @@ class _AboutItem extends StatelessWidget {
               ],
             ),
           ),
-          const Icon(Icons.chevron_right, color: Colors.grey, size: 20),
+          Icon(Icons.chevron_right, color: AppColors.textLight, size: 20),
         ],
+      ),
+    );
+  }
+}
+
+/// Pemilih tampilan: Ikuti HP · Terang · Gelap. Pilihan disimpan di perangkat.
+class _ThemePicker extends ConsumerWidget {
+  const _ThemePicker();
+
+  static const _options = [
+    (ThemeMode.system, Icons.brightness_auto_rounded, 'Ikuti HP'),
+    (ThemeMode.light, Icons.light_mode_rounded, 'Terang'),
+    (ThemeMode.dark, Icons.dark_mode_rounded, 'Gelap'),
+  ];
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final controller = ref.watch(themeControllerProvider);
+    // Dengar langsung agar pilihan tertanda walau warna tidak berubah
+    // (mis. memilih "Ikuti HP" saat HP sedang terang).
+    return ListenableBuilder(
+      listenable: controller,
+      builder: (context, _) {
+        return Semantics(
+          label: 'Tampilan aplikasi',
+          child: Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: AppColors.cardBg,
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(color: AppColors.line),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (final (mode, icon, label) in _options)
+                  _ThemeOption(
+                    icon: icon,
+                    label: label,
+                    selected: controller.mode == mode,
+                    onTap: () => controller.setMode(mode),
+                  ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _ThemeOption extends StatelessWidget {
+  const _ThemeOption({
+    required this.icon,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final fg = selected ? AppColors.navy900 : AppColors.textSecondary;
+    return Semantics(
+      button: true,
+      selected: selected,
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOut,
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration: BoxDecoration(
+            color: selected ? AppColors.secondary : Colors.transparent,
+            borderRadius: BorderRadius.circular(999),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 16, color: fg),
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: TextStyle(
+                  fontFamily: AppFonts.body,
+                  fontSize: 12,
+                  fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
+                  color: fg,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

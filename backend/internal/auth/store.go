@@ -46,6 +46,34 @@ func (s *PgAdminStore) FindByEmail(ctx context.Context, email string) (Admin, er
 	return a, nil
 }
 
+// FindByID mencari admin berdasarkan id (dari token).
+func (s *PgAdminStore) FindByID(ctx context.Context, id string) (Admin, error) {
+	var a Admin
+	err := s.pool.QueryRow(ctx,
+		"SELECT id::text, email, password_hash FROM admins WHERE id::text = $1", id,
+	).Scan(&a.ID, &a.Email, &a.PasswordHash)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return Admin{}, ErrAdminNotFound
+	}
+	if err != nil {
+		return Admin{}, fmt.Errorf("cari admin: %w", err)
+	}
+	return a, nil
+}
+
+// SetPassword mengganti hash password admin.
+func (s *PgAdminStore) SetPassword(ctx context.Context, id, passwordHash string) error {
+	tag, err := s.pool.Exec(ctx,
+		"UPDATE admins SET password_hash = $1, updated_at = now() WHERE id::text = $2", passwordHash, id)
+	if err != nil {
+		return fmt.Errorf("ganti password: %w", err)
+	}
+	if tag.RowsAffected() == 0 {
+		return ErrAdminNotFound
+	}
+	return nil
+}
+
 // Upsert membuat admin baru atau mengganti password admin yang sudah ada.
 func (s *PgAdminStore) Upsert(ctx context.Context, email, passwordHash string) error {
 	_, err := s.pool.Exec(ctx, `

@@ -24,6 +24,26 @@ func (f fakeAdmins) FindByEmail(_ context.Context, email string) (Admin, error) 
 	return a, nil
 }
 
+func (f fakeAdmins) FindByID(_ context.Context, id string) (Admin, error) {
+	for _, a := range f {
+		if a.ID == id {
+			return a, nil
+		}
+	}
+	return Admin{}, ErrAdminNotFound
+}
+
+func (f fakeAdmins) SetPassword(_ context.Context, id, hash string) error {
+	for k, a := range f {
+		if a.ID == id {
+			a.PasswordHash = hash
+			f[k] = a
+			return nil
+		}
+	}
+	return ErrAdminNotFound
+}
+
 func newTestHandler(t *testing.T) *Handler {
 	t.Helper()
 	hash, err := HashPassword("rahasia-gereja")
@@ -156,5 +176,34 @@ func TestRequireAndMe(t *testing.T) {
 	protected.ServeHTTP(rec, req)
 	if rec.Code != http.StatusOK || !strings.Contains(rec.Body.String(), "admin@gkjw.org") {
 		t.Errorf("status = %d body = %s", rec.Code, rec.Body)
+	}
+}
+
+func TestChangePassword(t *testing.T) {
+	h := newTestHandler(t)
+	token, _, _ := h.tokens.Issue("a1", "admin@gkjw.org")
+	change := func(body string) *httptest.ResponseRecorder {
+		req := httptest.NewRequest("PUT", "/auth/password", strings.NewReader(body))
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", "Bearer "+token)
+		rec := httptest.NewRecorder()
+		h.Require(http.HandlerFunc(h.ChangePassword)).ServeHTTP(rec, req)
+		return rec
+	}
+
+	if rec := change(`{"current_password":"salah-sekali-123","new_password":"password-baru-456"}`); rec.Code != http.StatusBadRequest {
+		t.Errorf("wrong current password: status = %d", rec.Code)
+	}
+	if rec := change(`{"current_password":"rahasia-gereja","new_password":"pendek"}`); rec.Code != http.StatusBadRequest {
+		t.Errorf("weak new password: status = %d", rec.Code)
+	}
+	if rec := change(`{"current_password":"rahasia-gereja","new_password":"password-baru-456"}`); rec.Code != http.StatusOK {
+		t.Fatalf("status = %d body = %s", rec.Code, rec.Body)
+	}
+	if login(t, h, `{"email":"admin@gkjw.org","password":"password-baru-456"}`).Code != http.StatusOK {
+		t.Error("login with new password failed")
+	}
+	if login(t, h, `{"email":"admin@gkjw.org","password":"rahasia-gereja"}`).Code != http.StatusUnauthorized {
+		t.Error("old password must stop working")
 	}
 }

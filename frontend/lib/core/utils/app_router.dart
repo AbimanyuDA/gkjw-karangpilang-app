@@ -2,8 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../features/auth/screens/login_screen.dart';
-import '../../features/auth/screens/splash_screen.dart';
+import '../../features/splash/screens/splash_screen.dart';
 import '../../features/beranda/screens/beranda_screen.dart';
 import '../../features/beranda/screens/warta_screen.dart';
 import '../../features/beranda/screens/tata_ibadah_screen.dart';
@@ -26,44 +25,18 @@ import '../../features/informasi/screens/notifikasi_screen.dart';
 import '../../features/informasi/screens/hubungi_kami_screen.dart';
 import '../../features/informasi/screens/tentang_screen.dart';
 import '../../features/informasi/screens/faq_screen.dart';
-import '../../features/admin/screens/admin_dashboard_screen.dart';
-import '../../features/admin/screens/admin_gereja_cover_screen.dart';
-import '../../data/services/auth_controller.dart';
 import '../widgets/main_shell.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
-/// Router dievaluasi ulang setiap status login admin berubah (refreshListenable).
-GoRouter createAppRouter(AuthController auth) => GoRouter(
+GoRouter createAppRouter() => GoRouter(
   navigatorKey: _rootNavigatorKey,
   initialLocation: '/splash',
-  refreshListenable: auth,
-  redirect: (context, state) {
-    final isAuth = auth.isLoggedIn;
-    final loc = state.matchedLocation;
-
-    // Splash selalu diizinkan
-    if (loc == '/splash') return null;
-
-    // Admin route hanya untuk yang login
-    if (loc.startsWith('/admin') && !isAuth) return '/login';
-
-    // Jika sudah login lalu ke login → redirect ke beranda
-    if (isAuth && loc == '/login') return '/beranda';
-
-    // Jemaat (belum login) boleh akses semua KECUALI /admin
-    // → Login hanya pintu masuk admin, bukan jemaat biasa
-    return null;
-  },
   routes: [
     GoRoute(
       path: '/splash',
       builder: (context, state) => const SplashScreen(),
-    ),
-    GoRoute(
-      path: '/login',
-      builder: (context, state) => const LoginScreen(),
     ),
     ShellRoute(
       navigatorKey: _shellNavigatorKey,
@@ -108,16 +81,6 @@ GoRouter createAppRouter(AuthController auth) => GoRouter(
             GoRoute(path: 'tentang', builder: (c, s) => const TentangScreen()),
             GoRoute(path: 'faq', builder: (c, s) => const FaqScreen()),
           ],
-        ),
-      ],
-    ),
-    GoRoute(
-      path: '/admin',
-      builder: (context, state) => const AdminDashboardScreen(),
-      routes: [
-        GoRoute(
-          path: 'gereja-cover',
-          builder: (c, s) => const AdminGerejaCoverScreen(),
         ),
       ],
     ),

@@ -3,6 +3,7 @@ package resource
 import (
 	"encoding/json"
 	"fmt"
+	"regexp"
 	"slices"
 	"strconv"
 	"strings"
@@ -106,6 +107,9 @@ func (f Field) convertText(raw any) (any, string) {
 	}
 	if f.URL && s != "" && !strings.HasPrefix(s, "https://") && !strings.HasPrefix(s, "http://") {
 		return nil, "harus berupa URL http(s)"
+	}
+	if f.Pattern != "" && s != "" && !regexp.MustCompile(f.Pattern).MatchString(s) {
+		return nil, "format tidak valid"
 	}
 	if len(f.OneOf) > 0 && !slices.Contains(f.OneOf, s) {
 		return nil, "harus salah satu dari: " + strings.Join(f.OneOf, ", ")

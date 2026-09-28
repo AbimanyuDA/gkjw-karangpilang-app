@@ -32,6 +32,7 @@ type Deps struct {
 	Repo           resource.Repository
 	Auth           *auth.Handler
 	Uploads        *upload.Handler
+	YouTube        YouTubeFetcher
 	AllowedOrigins []string
 	TrustProxy     bool
 }
@@ -71,6 +72,8 @@ func NewRouter(d Deps) http.Handler {
 			r.With(httprate.Limit(10, time.Minute, httprate.WithKeyFuncs(remoteIP))).
 				Post("/login", d.Auth.Login)
 			r.With(d.Auth.Require).Get("/me", d.Auth.Me)
+			r.With(d.Auth.Require, httprate.Limit(10, time.Minute, httprate.WithKeyFuncs(remoteIP))).
+				Put("/password", d.Auth.ChangePassword)
 		})
 
 		r.Route("/admin", func(r chi.Router) {
@@ -83,7 +86,8 @@ func NewRouter(d Deps) http.Handler {
 			r.Delete("/uploads/{bucket}/{name}", d.Uploads.Delete)
 
 			r.Group(func(r chi.Router) {
-				r.Use(middleware.Timeout(15 * time.Second))
+				r.Use(middleware.Timeout(20 * time.Second))
+				mountAdminExtras(r, d)
 				resource.MountAdmin(r, d.Repo, resource.All)
 			})
 		})

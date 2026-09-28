@@ -21,7 +21,7 @@ class PersembahanScreen extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
+                gradient: LinearGradient(
                   colors: [AppColors.primary, AppColors.primaryDark],
                 ),
                 borderRadius: BorderRadius.circular(20),
@@ -67,13 +67,13 @@ class PersembahanScreen extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: AppColors.gold500.withValues(alpha: 0.16),
+                            color: AppColors.tint,
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: const Icon(Icons.qr_code, color: AppColors.primary, size: 22),
+                          child: Icon(Icons.qr_code, color: AppColors.primary, size: 22),
                         ),
                         const SizedBox(width: 12),
-                        const Text(
+                        Text(
                           'QRIS GKJW Karangpilang',
                           style: TextStyle(
                             fontFamily: 'PlusJakartaSans',
@@ -90,11 +90,11 @@ class PersembahanScreen extends StatelessWidget {
                       width: 220,
                       height: 220,
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
+                        color: AppColors.surfaceAlt,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Colors.grey.shade300),
+                        border: Border.all(color: AppColors.line),
                       ),
-                      child: const Column(
+                      child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.qr_code_2, size: 120, color: AppColors.textPrimary),
@@ -147,7 +147,7 @@ class PersembahanScreen extends StatelessWidget {
                           child: const Icon(Icons.account_balance, color: Colors.blue, size: 22),
                         ),
                         const SizedBox(width: 12),
-                        const Text(
+                        Text(
                           'Transfer Bank',
                           style: TextStyle(
                             fontFamily: 'PlusJakartaSans',
@@ -178,7 +178,7 @@ class PersembahanScreen extends StatelessWidget {
                     ? AppColors.secondary.withValues(alpha: 0.3)
                     : Colors.transparent),
               ),
-              child: const Row(
+              child: Row(
                 children: [
                   Icon(Icons.info_outline, color: AppColors.secondary, size: 18),
                   SizedBox(width: 10),
@@ -215,16 +215,16 @@ class _BankInfo extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
+        color: AppColors.surfaceAlt,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: AppColors.line),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'Bank $bank',
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'PlusJakartaSans',
               fontWeight: FontWeight.w600,
               fontSize: 14,
@@ -238,7 +238,7 @@ class _BankInfo extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Nomor Rekening',
                     style: TextStyle(
                       fontFamily: 'PlusJakartaSans',
@@ -248,7 +248,7 @@ class _BankInfo extends StatelessWidget {
                   ),
                   Text(
                     norek,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'PlusJakartaSans',
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -268,13 +268,13 @@ class _BankInfo extends StatelessWidget {
                     ),
                   );
                 },
-                icon: const Icon(Icons.copy, color: AppColors.primary),
+                icon: Icon(Icons.copy, color: AppColors.primary),
                 tooltip: 'Salin nomor rekening',
               ),
             ],
           ),
           const Divider(height: 16),
-          const Text(
+          Text(
             'Atas Nama',
             style: TextStyle(
               fontFamily: 'PlusJakartaSans',
@@ -284,7 +284,7 @@ class _BankInfo extends StatelessWidget {
           ),
           Text(
             nama,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'PlusJakartaSans',
               fontSize: 14,
               fontWeight: FontWeight.w600,

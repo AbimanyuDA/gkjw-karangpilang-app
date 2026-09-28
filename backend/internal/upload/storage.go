@@ -39,6 +39,7 @@ var Buckets = map[string]Kind{
 	"galeri":        Image,
 	"profil":        Image,
 	"eperpus-cover": Image,
+	"dokumen-cover": Image,
 	"dokumen":       PDF,
 	"eperpus":       PDF,
 }

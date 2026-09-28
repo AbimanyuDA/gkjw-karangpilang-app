@@ -12,19 +12,21 @@ import (
 
 type contextKey struct{}
 
-// AdminFinder mencari admin berdasarkan email.
-type AdminFinder interface {
+// AdminStore adalah akses data admin yang dibutuhkan handler.
+type AdminStore interface {
 	FindByEmail(ctx context.Context, email string) (Admin, error)
+	FindByID(ctx context.Context, id string) (Admin, error)
+	SetPassword(ctx context.Context, id, passwordHash string) error
 }
 
 // Handler melayani endpoint login.
 type Handler struct {
-	admins AdminFinder
+	admins AdminStore
 	tokens *Tokens
 }
 
 // NewHandler membuat handler auth.
-func NewHandler(admins AdminFinder, tokens *Tokens) *Handler {
+func NewHandler(admins AdminStore, tokens *Tokens) *Handler {
 	return &Handler{admins: admins, tokens: tokens}
 }
 
@@ -84,6 +86,43 @@ func (h *Handler) Me(w http.ResponseWriter, r *http.Request) {
 		"email":      claims.Email,
 		"expires_at": claims.ExpiresAt.Time,
 	}, nil)
+}
+
+type changePasswordRequest struct {
+	CurrentPassword string `json:"current_password"`
+	NewPassword     string `json:"new_password"`
+}
+
+// ChangePassword mengganti password admin yang sedang login.
+func (h *Handler) ChangePassword(w http.ResponseWriter, r *http.Request) {
+	var req changePasswordRequest
+	if err := httpx.DecodeJSON(r, &req); err != nil {
+		httpx.Fail(w, r, err)
+		return
+	}
+	admin, err := h.admins.FindByID(r.Context(), ClaimsFrom(r.Context()).Subject)
+	if errors.Is(err, ErrAdminNotFound) {
+		httpx.Fail(w, r, httpx.ErrUnauthorized)
+		return
+	}
+	if err != nil {
+		httpx.Fail(w, r, err)
+		return
+	}
+	if !CheckPassword(admin.PasswordHash, req.CurrentPassword) {
+		httpx.Fail(w, r, httpx.Validation(map[string]string{"current_password": "password lama salah"}))
+		return
+	}
+	hash, err := HashPassword(req.NewPassword)
+	if err != nil {
+		httpx.Fail(w, r, httpx.Validation(map[string]string{"new_password": err.Error()}))
+		return
+	}
+	if err := h.admins.SetPassword(r.Context(), admin.ID, hash); err != nil {
+		httpx.Fail(w, r, err)
+		return
+	}
+	httpx.OK(w, http.StatusOK, map[string]string{"status": "password diganti"}, nil)
 }
 
 // Require adalah middleware yang menolak request tanpa token admin yang valid.

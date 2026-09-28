@@ -34,6 +34,7 @@ import (
 	"github.com/AbimanyuDA/gkjw-karangpilang-app/backend/internal/resource"
 	"github.com/AbimanyuDA/gkjw-karangpilang-app/backend/internal/server"
 	"github.com/AbimanyuDA/gkjw-karangpilang-app/backend/internal/upload"
+	"github.com/AbimanyuDA/gkjw-karangpilang-app/backend/internal/youtube"
 )
 
 func main() {
@@ -99,6 +100,7 @@ func serve(ctx context.Context, cfg config.Config, pool *pgxpool.Pool) error {
 		Repo:           resource.NewPgStore(pool),
 		Auth:           auth.NewHandler(auth.NewPgAdminStore(pool), auth.NewTokens(cfg.JWTSecret, cfg.JWTTTL)),
 		Uploads:        upload.NewHandler(storage),
+		YouTube:        youtube.Client{HTTP: &http.Client{Timeout: 15 * time.Second}},
 		AllowedOrigins: cfg.CORSAllowedOrigins,
 		TrustProxy:     cfg.TrustProxy,
 	})

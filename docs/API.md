@@ -27,6 +27,7 @@ Jika gagal: `"success": false` dan `"error": { "code": "validation_error", "mess
 |---|---|
 | `POST /auth/login` | `{"email","password"}` → `{token, expires_at, email}`. Dibatasi 10×/menit per IP |
 | `GET /auth/me` | `Authorization: Bearer <token>` |
+| `PUT /auth/password` | `{"current_password","new_password"}` — ganti password admin yang sedang login |
 
 ## Admin (`Authorization: Bearer <token>`)
 
@@ -37,10 +38,12 @@ Jika gagal: `"success": false` dan `"error": { "code": "validation_error", "mess
 | `PUT /admin/{konten}/{id}` | Ubah. **Hanya field yang dikirim yang diubah** |
 | `DELETE /admin/{konten}/{id}` | Hapus |
 | `PUT /admin/informasi-gereja` (dan singleton lain) | Buat/ubah konfigurasi |
+| `GET /admin/schema` | Daftar konten, field, dan bucket — dasar menu & form website admin |
+| `GET /admin/youtube?url=<link>` | Judul, deskripsi, tanggal, thumbnail video YouTube (tanpa API key Google) |
 | `POST /admin/uploads?bucket=X` | `multipart/form-data` field `file` → `{url, bucket, name}` |
 | `DELETE /admin/uploads/{bucket}/{nama}` | Hapus file |
 
-Bucket: `banners`, `gereja-covers`, `galeri`, `profil`, `eperpus-cover` (JPG/PNG/WebP, maks. 5 MB), `dokumen`, `eperpus` (PDF, maks. 30 MB). Jenis file diperiksa dari isinya, bukan dari nama file.
+Bucket: `banners`, `gereja-covers`, `galeri`, `profil`, `eperpus-cover`, `dokumen-cover` (JPG/PNG/WebP, maks. 5 MB), `dokumen`, `eperpus` (PDF, maks. 30 MB). Jenis file diperiksa dari isinya, bukan dari nama file.
 
 ## Daftar konten
 

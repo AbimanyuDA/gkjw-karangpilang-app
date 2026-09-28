@@ -8,20 +8,13 @@ import '../helpers/fake_http.dart';
 
 void main() {
   late FakeHttpAdapter http;
-  late String? token;
-  late int unauthorizedCalls;
   late ApiClient api;
 
   setUp(() {
     http = FakeHttpAdapter();
-    token = null;
-    unauthorizedCalls = 0;
-    final dio = Dio(BaseOptions(baseUrl: 'https://api.test/api/v1'))..httpClientAdapter = http;
     api = ApiClient(
       baseUrl: 'unused',
-      tokenReader: () => token,
-      onUnauthorized: () => unauthorizedCalls++,
-      dio: dio,
+      dio: Dio(BaseOptions(baseUrl: 'https://api.test/api/v1'))..httpClientAdapter = http,
     );
   });
 
@@ -37,6 +30,7 @@ void main() {
         {'id': '1'},
       ]);
       expect(http.requests.single.uri.toString(), 'https://api.test/api/v1/agenda?limit=5');
+      expect(http.requests.single.headers['Authorization'], isNull, reason: 'aplikasi tidak pernah login');
     });
 
     test('getObject returns null for an empty singleton', () async {
@@ -44,36 +38,15 @@ void main() {
       expect(await api.getObject('/tentang-aplikasi'), isNull);
     });
 
-    test('sends bearer token only to admin endpoints', () async {
-      token = 'abc';
-      http
-        ..reply(200, ok([]))
-        ..reply(200, ok({'id': 'x'}));
-
-      await api.getList('/agenda');
-      await api.post('/admin/agenda', {'judul': 'x'});
-
-      expect(http.requests[0].headers['Authorization'], isNull);
-      expect(http.requests[1].headers['Authorization'], 'Bearer abc');
-    });
-
-    test('maps server validation errors to ApiException with fields', () async {
-      http.reply(400, err('validation_error', 'Data tidak valid', fields: {'judul': 'wajib diisi'}));
+    test('maps server errors to ApiException with fields', () async {
+      http.reply(400, err('validation_error', 'Data tidak valid', fields: {'kategori': 'tidak dikenal'}));
 
       await expectLater(
-        api.post('/admin/agenda', {}),
+        api.getList('/dokumen'),
         throwsA(isA<ApiException>()
             .having((e) => e.code, 'code', 'validation_error')
-            .having((e) => e.fields['judul'], 'field', 'wajib diisi')
-            .having((e) => e.toString(), 'message', contains('judul: wajib diisi'))),
+            .having((e) => e.toString(), 'message', contains('kategori: tidak dikenal'))),
       );
-    });
-
-    test('calls onUnauthorized on 401 so the admin session is cleared', () async {
-      http.reply(401, err('unauthorized', 'Silakan login terlebih dahulu'));
-
-      await expectLater(api.delete('/admin/faq/1'), throwsA(isA<ApiException>()));
-      expect(unauthorizedCalls, 1);
     });
 
     test('network failure becomes a friendly offline error', () async {
@@ -83,33 +56,20 @@ void main() {
         api.getList('/agenda'),
         throwsA(isA<ApiException>().having((e) => e.code, 'code', 'offline')),
       );
-      expect(unauthorizedCalls, 0);
     });
 
-    test('login parses the session', () async {
-      http.reply(200, ok({
-        'token': 'jwt',
-        'email': 'admin@gkjw.org',
-        'expires_at': '2099-01-01T00:00:00Z',
-      }));
+    test('timeout becomes a friendly timeout error', () async {
+      http.fail(DioExceptionType.receiveTimeout);
 
-      final session = await api.login('admin@gkjw.org', 'secret');
-
-      expect(session.token, 'jwt');
-      expect(session.isExpired, isFalse);
+      await expectLater(
+        api.getList('/agenda'),
+        throwsA(isA<ApiException>().having((e) => e.code, 'code', 'timeout')),
+      );
     });
 
-    test('deleteFileByUrl only deletes files hosted on our server', () async {
-      http.reply(200, ok({}));
-
-      await api.deleteFileByUrl('https://drive.google.com/file/d/x/view',
-          filesUrlPrefix: 'https://api.test/files/');
-      await api.deleteFileByUrl('https://api.test/files/banners/abc.jpg',
-          filesUrlPrefix: 'https://api.test/files/');
-
-      expect(http.requests, hasLength(1));
-      expect(http.requests.single.method, 'DELETE');
-      expect(http.requests.single.path, '/admin/uploads/banners/abc.jpg');
+    test('rejects a response without the success envelope', () async {
+      http.reply(200, {'unexpected': true});
+      await expectLater(api.getList('/agenda'), throwsA(isA<ApiException>()));
     });
   });
 
@@ -147,6 +107,19 @@ void main() {
     test('getGaleriTahun returns ints', () async {
       http.reply(200, ok([2026, 2024]));
       expect(await ContentService(api).getGaleriTahun(), [2026, 2024]);
+    });
+
+    test('getSiaran passes kategori only when set', () async {
+      http
+        ..reply(200, ok([]))
+        ..reply(200, ok([]));
+      final service = ContentService(api);
+
+      await service.getSiaran();
+      await service.getSiaran(kategori: 'anak');
+
+      expect(http.requests[0].uri.queryParameters.containsKey('kategori'), isFalse);
+      expect(http.requests[1].uri.queryParameters['kategori'], 'anak');
     });
   });
 }

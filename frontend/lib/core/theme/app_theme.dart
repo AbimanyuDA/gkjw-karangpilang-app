@@ -1,6 +1,11 @@
 // lib/core/theme/app_theme.dart
-// Palet & tipografi mengikuti website GKJW Karangpilang (GKJW-LandingPage/src/styles/tokens.css):
-// dominan cream/ivory, navy untuk teks & elemen utama, emas sebagai aksen.
+// Palet & tipografi mengikuti website GKJW Karangpilang (GKJW-LandingPage/src/styles/tokens.css).
+//
+//   Tema TERANG  → cream/ivory dominan, teks navy, aksen emas.
+//   Tema GELAP   → navy dominan (seperti mode gelap website), teks ivory, aksen emas.
+//
+// Tema mengikuti pengaturan HP. Seluruh layar membaca warna lewat `AppColors.*`,
+// yang menunjuk ke palet aktif (diatur di main.dart saat tema HP berubah).
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -14,10 +19,113 @@ class AppFonts {
   static const String display = 'SourceSerif4';
 }
 
+/// Kumpulan warna untuk satu tema.
+@immutable
+class AppPalette {
+  const AppPalette({
+    required this.brightness,
+    required this.primary,
+    required this.primaryDark,
+    required this.primaryLight,
+    required this.secondary,
+    required this.accentText,
+    required this.heading,
+    required this.background,
+    required this.surface,
+    required this.cardBg,
+    required this.surfaceAlt,
+    required this.tint,
+    required this.line,
+    required this.textPrimary,
+    required this.textSecondary,
+    required this.textLight,
+    required this.success,
+    required this.error,
+  });
+
+  final Brightness brightness;
+
+  /// Warna utama untuk ikon, penekanan, dan latar tombol/kartu penting.
+  final Color primary;
+  final Color primaryDark;
+  final Color primaryLight;
+
+  /// Aksen emas (tombol utama, penanda aktif).
+  final Color secondary;
+
+  /// Teks beraksen emas yang tetap terbaca di atas latar.
+  final Color accentText;
+
+  /// Warna judul.
+  final Color heading;
+
+  final Color background;
+  final Color surface;
+  final Color cardBg;
+  final Color surfaceAlt;
+
+  /// Latar lembut untuk ikon/chip (emas tipis di terang, biru di gelap).
+  final Color tint;
+  final Color line;
+
+  final Color textPrimary;
+  final Color textSecondary;
+  final Color textLight;
+
+  final Color success;
+  final Color error;
+
+  bool get isDark => brightness == Brightness.dark;
+
+  /// TERANG — cream, putih, emas.
+  static const light = AppPalette(
+    brightness: Brightness.light,
+    primary: AppColors.navy900,
+    primaryDark: AppColors.navy950,
+    primaryLight: AppColors.navy700,
+    secondary: AppColors.gold500,
+    accentText: AppColors.gold700,
+    heading: AppColors.navy900,
+    background: AppColors.ivory100,
+    surface: AppColors.ivory50,
+    cardBg: AppColors.ivory50,
+    surfaceAlt: AppColors.ivory200,
+    tint: Color(0x29D9A23A), // gold-500 @ 16%
+    line: Color(0x1716202E), // ink-900 @ 9%
+    textPrimary: Color(0xFF16202E),
+    textSecondary: Color(0xFF3A4658),
+    textLight: Color(0xFF677285),
+    success: Color(0xFF2E7D4F),
+    error: Color(0xFFB3261E),
+  );
+
+  /// GELAP — navy (nilai dari tema gelap website).
+  static const dark = AppPalette(
+    brightness: Brightness.dark,
+    primary: Color(0xFF6F9BDC), // biru terang: terbaca di atas navy
+    primaryDark: AppColors.navy700,
+    primaryLight: Color(0xFF9DBCEA),
+    secondary: Color(0xFFE9BD55), // gold-400
+    accentText: Color(0xFFE9BD55),
+    heading: AppColors.ivory50,
+    background: Color(0xFF0A1422),
+    surface: Color(0xFF0E1A2C),
+    cardBg: Color(0xFF15233A),
+    surfaceAlt: Color(0xFF1A2C49),
+    tint: Color(0xFF1C3A63),
+    line: Color(0x1FF3D58A), // gold-300 @ 12%
+    textPrimary: Color(0xFFECE6D8),
+    textSecondary: Color(0xFFC2BDB0),
+    textLight: Color(0xFF9AA2B1),
+    success: Color(0xFF81C995),
+    error: Color(0xFFF2B8B5),
+  );
+}
+
 class AppColors {
   AppColors._();
 
-  // ── Palet dasar (token website) ──
+  // ── Palet dasar website (tetap, tidak ikut tema) ──
   static const Color navy950 = Color(0xFF06142A);
   static const Color navy900 = Color(0xFF0B1F3A);
   static const Color navy800 = Color(0xFF122B4D);
@@ -30,39 +138,40 @@ class AppColors {
   static const Color ivory100 = Color(0xFFF8F2E4);
   static const Color ivory200 = Color(0xFFEFE5CF);
 
+  // ── Palet aktif (berganti mengikuti tema HP) ──
+  static AppPalette _palette = AppPalette.light;
+  static AppPalette get palette => _palette;
+  static bool get isDark => _palette.isDark;
+
+  /// Dipanggil di main.dart saat tema HP berubah.
+  static void use(AppPalette palette) => _palette = palette;
+
   // ── Peran (dipakai di seluruh aplikasi) ──
-  /// Warna utama: navy — teks penting, ikon, tombol sekunder, header gelap.
-  static const Color primary = navy900;
-  static const Color primaryDark = navy950;
-  static const Color primaryLight = navy700;
+  static Color get primary => _palette.primary;
+  static Color get primaryDark => _palette.primaryDark;
+  static Color get primaryLight => _palette.primaryLight;
+  static Color get secondary => _palette.secondary;
+  static Color get secondaryLight => gold300;
+  static Color get accentText => _palette.accentText;
+  static Color get heading => _palette.heading;
 
-  /// Aksen emas — tombol utama, penanda aktif.
-  static const Color secondary = gold500;
-  static const Color secondaryLight = gold300;
-  static const Color secondaryDark = gold600;
+  static Color get background => _palette.background;
+  static Color get surface => _palette.surface;
+  static Color get cardBg => _palette.cardBg;
+  static Color get surfaceAlt => _palette.surfaceAlt;
+  static Color get tint => _palette.tint;
+  static Color get line => _palette.line;
 
-  /// Teks emas di atas cream (kontras cukup untuk dibaca).
-  static const Color accentText = gold700;
+  static Color get textPrimary => _palette.textPrimary;
+  static Color get textSecondary => _palette.textSecondary;
+  static Color get textLight => _palette.textLight;
 
-  // Latar
-  static const Color background = ivory100; // cream — warna dominan
-  static const Color surface = ivory50;
-  static const Color cardBg = ivory50;
-  static const Color surfaceAlt = ivory200;
-  static const Color line = Color(0x1716202E); // ink-900 @ 9%
+  static Color get success => _palette.success;
+  static Color get error => _palette.error;
+  static Color get warning => gold600;
+  static Color get info => _palette.primary;
 
-  // Teks
-  static const Color textPrimary = Color(0xFF16202E);
-  static const Color textSecondary = Color(0xFF3A4658);
-  static const Color textLight = Color(0xFF677285);
-
-  // Status
-  static const Color success = Color(0xFF2E7D4F);
-  static const Color error = Color(0xFFB3261E);
-  static const Color warning = Color(0xFFB5842A);
-  static const Color info = navy700;
-
-  // Gradien (header gelap seperti hero website mode gelap)
+  /// Header/kartu gelap (navy di kedua tema).
   static const LinearGradient primaryGradient = LinearGradient(
     colors: [navy800, navy950],
     begin: Alignment.topLeft,
@@ -88,62 +197,68 @@ class AppTheme {
   static const _serif = AppFonts.display;
   static const _sans = AppFonts.body;
 
-  static ThemeData get lightTheme {
+  static ThemeData get lightTheme => _build(AppPalette.light);
+  static ThemeData get darkTheme => _build(AppPalette.dark);
+
+  static ThemeData _build(AppPalette p) {
     final scheme = ColorScheme.fromSeed(
       seedColor: AppColors.navy900,
-      primary: AppColors.navy900,
-      onPrimary: AppColors.ivory50,
-      secondary: AppColors.gold500,
+      brightness: p.brightness,
+      primary: p.primary,
+      onPrimary: p.isDark ? AppColors.navy950 : AppColors.ivory50,
+      secondary: p.secondary,
       onSecondary: AppColors.navy900,
-      surface: AppColors.ivory50,
-      onSurface: AppColors.textPrimary,
-      error: AppColors.error,
+      surface: p.surface,
+      onSurface: p.textPrimary,
+      error: p.error,
     );
 
     return ThemeData(
       useMaterial3: true,
+      brightness: p.brightness,
       fontFamily: _sans,
       colorScheme: scheme,
-      scaffoldBackgroundColor: AppColors.background,
-      dividerColor: AppColors.line,
+      scaffoldBackgroundColor: p.background,
+      dividerColor: p.line,
+      canvasColor: p.surface,
 
-      // Header cream dengan teks navy — seperti header website.
-      appBarTheme: const AppBarTheme(
-        backgroundColor: AppColors.ivory50,
-        foregroundColor: AppColors.navy900,
+      // Header polos (cream / navy) dengan judul serif — seperti header website.
+      appBarTheme: AppBarTheme(
+        backgroundColor: p.surface,
+        foregroundColor: p.heading,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 1,
-        shadowColor: AppColors.line,
+        shadowColor: p.line,
         centerTitle: true,
-        systemOverlayStyle: SystemUiOverlayStyle.dark,
-        shape: Border(bottom: BorderSide(color: AppColors.line)),
+        systemOverlayStyle: p.isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
+        shape: Border(bottom: BorderSide(color: p.line)),
         titleTextStyle: TextStyle(
           fontFamily: _serif,
           fontSize: 20,
           fontWeight: FontWeight.w700,
-          color: AppColors.navy900,
+          color: p.heading,
         ),
-        iconTheme: IconThemeData(color: AppColors.navy900),
+        iconTheme: IconThemeData(color: p.heading),
       ),
 
       cardTheme: CardThemeData(
-        color: AppColors.cardBg,
+        color: p.cardBg,
         surfaceTintColor: Colors.transparent,
-        elevation: 1,
+        elevation: p.isDark ? 0 : 1,
         shadowColor: AppColors.navy900.withValues(alpha: 0.12),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14),
-          side: const BorderSide(color: AppColors.line),
+          side: BorderSide(color: p.line),
         ),
       ),
 
       // Tombol utama: emas dengan teks navy (seperti "Jadwal Ibadah" di website).
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.gold500,
+          backgroundColor: p.secondary,
           foregroundColor: AppColors.navy900,
-          disabledBackgroundColor: AppColors.ivory200,
+          disabledBackgroundColor: p.surfaceAlt,
           elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           shape: const StadiumBorder(),
@@ -152,58 +267,47 @@ class AppTheme {
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.navy900,
-          side: const BorderSide(color: AppColors.navy900),
+          foregroundColor: p.heading,
+          side: BorderSide(color: p.heading),
           shape: const StadiumBorder(),
           textStyle: const TextStyle(fontFamily: _sans, fontWeight: FontWeight.w600),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: AppColors.navy800,
+          foregroundColor: p.primary,
           textStyle: const TextStyle(fontFamily: _sans, fontWeight: FontWeight.w600),
         ),
-      ),
-      floatingActionButtonTheme: const FloatingActionButtonThemeData(
-        backgroundColor: AppColors.gold500,
-        foregroundColor: AppColors.navy900,
-        elevation: 3,
-        extendedTextStyle: TextStyle(fontFamily: _sans, fontWeight: FontWeight.w700),
       ),
 
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: Colors.white,
+        fillColor: p.cardBg,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.ivory200),
+          borderSide: BorderSide(color: p.line),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.ivory200),
+          borderSide: BorderSide(color: p.line),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.gold600, width: 2),
+          borderSide: BorderSide(color: p.secondary, width: 2),
         ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.error),
-        ),
-        labelStyle: const TextStyle(fontFamily: _sans, color: AppColors.textSecondary),
-        floatingLabelStyle: const TextStyle(fontFamily: _sans, color: AppColors.accentText),
-        prefixIconColor: AppColors.textLight,
+        labelStyle: TextStyle(fontFamily: _sans, color: p.textSecondary),
+        prefixIconColor: p.textLight,
       ),
 
-      dialogTheme: const DialogThemeData(
-        backgroundColor: AppColors.ivory50,
+      dialogTheme: DialogThemeData(
+        backgroundColor: p.surface,
         surfaceTintColor: Colors.transparent,
         titleTextStyle: TextStyle(
           fontFamily: _serif,
           fontSize: 20,
           fontWeight: FontWeight.w700,
-          color: AppColors.navy900,
+          color: p.heading,
         ),
       ),
       snackBarTheme: const SnackBarThemeData(
@@ -211,41 +315,37 @@ class AppTheme {
         contentTextStyle: TextStyle(fontFamily: _sans, color: AppColors.ivory50),
         behavior: SnackBarBehavior.floating,
       ),
-      progressIndicatorTheme: const ProgressIndicatorThemeData(
-        color: AppColors.gold600,
-        linearTrackColor: AppColors.ivory200,
+      progressIndicatorTheme: ProgressIndicatorThemeData(
+        color: p.secondary,
+        linearTrackColor: p.surfaceAlt,
       ),
-      chipTheme: const ChipThemeData(
-        backgroundColor: AppColors.ivory50,
-        selectedColor: AppColors.navy900,
-        side: BorderSide(color: AppColors.ivory200),
-        labelStyle: TextStyle(fontFamily: _sans, color: AppColors.navy900),
-        secondaryLabelStyle: TextStyle(fontFamily: _sans, color: AppColors.ivory50),
-        shape: StadiumBorder(),
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith(
+          (s) => s.contains(WidgetState.selected) ? AppColors.navy900 : p.textLight,
+        ),
+        trackColor: WidgetStateProperty.resolveWith(
+          (s) => s.contains(WidgetState.selected) ? p.secondary : p.surfaceAlt,
+        ),
       ),
-
-      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        backgroundColor: AppColors.ivory50,
-        selectedItemColor: AppColors.navy900,
-        unselectedItemColor: AppColors.textLight,
-        showSelectedLabels: true,
-        showUnselectedLabels: true,
-        type: BottomNavigationBarType.fixed,
-        elevation: 12,
-        selectedLabelStyle: TextStyle(fontFamily: _sans, fontSize: 11, fontWeight: FontWeight.w700),
-        unselectedLabelStyle: TextStyle(fontFamily: _sans, fontSize: 11),
+      chipTheme: ChipThemeData(
+        backgroundColor: p.cardBg,
+        selectedColor: p.secondary,
+        side: BorderSide(color: p.line),
+        labelStyle: TextStyle(fontFamily: _sans, color: p.textPrimary),
+        secondaryLabelStyle: const TextStyle(fontFamily: _sans, color: AppColors.navy900),
+        shape: const StadiumBorder(),
       ),
 
-      // Judul serif navy, isi sans — pasangan yang sama dengan website.
-      textTheme: const TextTheme(
-        displayLarge: TextStyle(fontFamily: _serif, fontSize: 34, fontWeight: FontWeight.w700, color: AppColors.navy900),
-        headlineLarge: TextStyle(fontFamily: _serif, fontSize: 26, fontWeight: FontWeight.w700, color: AppColors.navy900),
-        headlineMedium: TextStyle(fontFamily: _serif, fontSize: 22, fontWeight: FontWeight.w700, color: AppColors.navy900),
-        titleLarge: TextStyle(fontFamily: _serif, fontSize: 19, fontWeight: FontWeight.w700, color: AppColors.navy900),
-        titleMedium: TextStyle(fontFamily: _sans, fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
-        bodyLarge: TextStyle(fontFamily: _sans, fontSize: 15, fontWeight: FontWeight.w400, color: AppColors.textPrimary),
-        bodyMedium: TextStyle(fontFamily: _sans, fontSize: 13, fontWeight: FontWeight.w400, color: AppColors.textSecondary),
-        labelLarge: TextStyle(fontFamily: _sans, fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+      // Judul serif, isi sans — pasangan yang sama dengan website.
+      textTheme: TextTheme(
+        displayLarge: TextStyle(fontFamily: _serif, fontSize: 34, fontWeight: FontWeight.w700, color: p.heading),
+        headlineLarge: TextStyle(fontFamily: _serif, fontSize: 26, fontWeight: FontWeight.w700, color: p.heading),
+        headlineMedium: TextStyle(fontFamily: _serif, fontSize: 22, fontWeight: FontWeight.w700, color: p.heading),
+        titleLarge: TextStyle(fontFamily: _serif, fontSize: 19, fontWeight: FontWeight.w700, color: p.heading),
+        titleMedium: TextStyle(fontFamily: _sans, fontSize: 16, fontWeight: FontWeight.w600, color: p.textPrimary),
+        bodyLarge: TextStyle(fontFamily: _sans, fontSize: 15, fontWeight: FontWeight.w400, color: p.textPrimary),
+        bodyMedium: TextStyle(fontFamily: _sans, fontSize: 13, fontWeight: FontWeight.w400, color: p.textSecondary),
+        labelLarge: TextStyle(fontFamily: _sans, fontSize: 14, fontWeight: FontWeight.w600, color: p.textPrimary),
       ),
     );
   }

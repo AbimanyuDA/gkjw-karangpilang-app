@@ -1,6 +1,9 @@
 package resource
 
-import "testing"
+import (
+	"regexp"
+	"testing"
+)
 
 // TestRegistryConsistent menjaga agar spec di registry.go tidak saling bertentangan.
 func TestRegistryConsistent(t *testing.T) {
@@ -37,6 +40,27 @@ func TestRegistryConsistent(t *testing.T) {
 			}
 			if r.UpsertKey != "" && !seen[r.UpsertKey] {
 				t.Errorf("UpsertKey %q bukan field", r.UpsertKey)
+			}
+			if r.Label == "" || r.Group == "" {
+				t.Error("Label dan Group wajib diisi (dipakai website admin)")
+			}
+			for _, f := range r.Fields {
+				if f.Label == "" {
+					t.Errorf("field %q tanpa Label", f.Name)
+				}
+				if (f.Input == InputImage || f.Input == InputPDF) && f.Upload == "" {
+					t.Errorf("field %q butuh Upload bucket", f.Name)
+				}
+				if f.Pattern != "" {
+					if _, err := regexp.Compile(f.Pattern); err != nil {
+						t.Errorf("Pattern %q tidak valid: %v", f.Name, err)
+					}
+				}
+			}
+			for _, c := range append(append([]string{}, r.Columns...), r.TitleField) {
+				if c != "" && !seen[c] {
+					t.Errorf("kolom/judul %q bukan field", c)
+				}
 			}
 			if r.Singleton && (len(r.Filters) > 0 || r.UpsertKey != "") {
 				t.Error("singleton tidak mendukung filter/upsert")
