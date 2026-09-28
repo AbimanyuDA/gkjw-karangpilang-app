@@ -20,7 +20,8 @@ export function SingletonPage({ resource, schema }: { resource: ResourceSchema; 
         ) : q.isError ? (
           <p className="form-error">Data gagal dimuat: {(q.error as Error).message}</p>
         ) : (
-          <ResourceForm key={q.dataUpdatedAt} resource={resource} buckets={schema.buckets} row={q.data} />
+          // key tetap: form tidak dimuat ulang tiap kali simpan otomatis selesai (fokus ketikan tidak hilang).
+          <ResourceForm key={resource.path} resource={resource} buckets={schema.buckets} row={q.data} autoSave />
         )}
       </div>
     </div>

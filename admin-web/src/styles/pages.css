@@ -890,3 +890,69 @@ dialog::backdrop {
   box-shadow: var(--shadow-lift);
   background: var(--surface);
 }
+
+/* ── Simpan otomatis (halaman satu-form) ───────────── */
+.autosave-bar {
+  position: sticky;
+  bottom: 1rem;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin: 1.5rem calc(-1 * clamp(0.5rem, 0.25rem + 1vw, 1rem)) 0;
+  padding: 0.7rem 0.75rem 0.7rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--card) 90%, transparent);
+  backdrop-filter: blur(8px);
+  box-shadow: var(--shadow-lift);
+}
+.autosave-dot {
+  flex: none;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: var(--text-subtle);
+  transition: background-color var(--duration-fast, 150ms) ease;
+}
+.autosave-bar[data-status='saved'] .autosave-dot {
+  background: var(--ok);
+}
+.autosave-bar[data-status='pending'] .autosave-dot,
+.autosave-bar[data-status='saving'] .autosave-dot {
+  background: var(--accent);
+  animation: autosave-pulse 1s ease-in-out infinite;
+}
+.autosave-bar[data-status='error'] .autosave-dot {
+  background: var(--danger);
+}
+.autosave-bar[data-status='error'] .autosave-label {
+  color: var(--danger);
+}
+.autosave-label {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--text-sm);
+  color: var(--text-muted, var(--text-subtle));
+}
+.autosave-bar .btn {
+  flex: none;
+}
+@keyframes autosave-pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .autosave-bar .autosave-dot {
+    animation: none;
+  }
+}
+@media (max-width: 30rem) {
+  .autosave-bar {
+    flex-wrap: wrap;
+  }
+  .autosave-bar .btn {
+    width: 100%;
+  }
+}

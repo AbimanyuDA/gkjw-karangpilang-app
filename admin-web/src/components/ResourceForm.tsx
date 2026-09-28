@@ -1,4 +1,5 @@
-import { useState, type FormEvent } from 'react'
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
+import { useAutoSave, type AutoSave } from '../hooks/useAutoSave'
 import { ApiError } from '../lib/api'
 import { emptyValues, toFormValues, toPayload, validate, type FormErrors, type FormValue, type FormValues } from '../lib/form'
 import { useSave } from '../lib/queries'
@@ -15,9 +16,11 @@ interface Props {
   preset?: Record<string, string>
   onSaved?: (row: Row) => void
   onCancel?: () => void
+  /** Simpan otomatis setiap ada perubahan (untuk halaman satu-form seperti Informasi Gereja). */
+  autoSave?: boolean
 }
 
-export function ResourceForm({ resource, buckets, row, preset, onSaved, onCancel }: Props) {
+export function ResourceForm({ resource, buckets, row, preset, onSaved, onCancel, autoSave = false }: Props) {
   const isNew = !row && !resource.singleton
   // Urutan diatur dengan drag di daftar; data baru otomatis ditaruh paling akhir oleh server.
   const fields = resource.sortable ? resource.fields.filter((f) => f.name !== 'urutan') : resource.fields
@@ -27,6 +30,39 @@ export function ResourceForm({ resource, buckets, row, preset, onSaved, onCancel
   const [uploading, setUploading] = useState(0)
   const save = useSave(resource)
   const toast = useToast()
+  const { mutateAsync } = save
+  const valuesRef = useRef(values)
+  useEffect(() => {
+    valuesRef.current = values
+  }, [values])
+
+  function showServerErrors(err: unknown) {
+    if (err instanceof ApiError && Object.keys(err.fields).length > 0) {
+      setErrors(Object.fromEntries(Object.entries(err.fields).map(([k, v]) => [k, v.charAt(0).toUpperCase() + v.slice(1)])))
+      return true
+    }
+    return false
+  }
+
+  const autoSaveFn = useCallback(
+    async (snapshot: string) => {
+      const found = validate(fields, valuesRef.current)
+      setErrors(found)
+      if (Object.keys(found).length > 0) throw new Error('Periksa isian yang ditandai merah.')
+      try {
+        await mutateAsync({ id: row?.id, body: JSON.parse(snapshot) as Record<string, unknown> })
+      } catch (err) {
+        showServerErrors(err)
+        throw err
+      }
+    },
+    [fields, row?.id, mutateAsync],
+  )
+  const auto = useAutoSave({
+    snapshot: JSON.stringify(toPayload(fields, values)),
+    save: autoSaveFn,
+    blocked: !autoSave || uploading > 0,
+  })
 
   const set = (name: string, v: FormValue) => {
     setValues((prev) => ({ ...prev, [name]: v }))
@@ -47,6 +83,10 @@ export function ResourceForm({ resource, buckets, row, preset, onSaved, onCancel
 
   async function submit(e: FormEvent) {
     e.preventDefault()
+    if (autoSave) {
+      await auto.saveNow()
+      return
+    }
     setFormError(null)
     const found = validate(fields, values)
     setErrors(found)
@@ -59,11 +99,7 @@ export function ResourceForm({ resource, buckets, row, preset, onSaved, onCancel
       toast(isNew ? `${resource.label}: data ditambahkan` : 'Perubahan disimpan')
       onSaved?.(saved)
     } catch (err) {
-      if (err instanceof ApiError && Object.keys(err.fields).length > 0) {
-        setErrors(Object.fromEntries(Object.entries(err.fields).map(([k, v]) => [k, v.charAt(0).toUpperCase() + v.slice(1)])))
-      } else {
-        setFormError(err instanceof Error ? err.message : 'Gagal menyimpan.')
-      }
+      if (!showServerErrors(err)) setFormError(err instanceof Error ? err.message : 'Gagal menyimpan.')
     }
   }
 
@@ -95,6 +131,10 @@ export function ResourceForm({ resource, buckets, row, preset, onSaved, onCancel
           </div>
         )
       })}
+      {autoSave ? (
+        <AutoSaveBar auto={auto} uploading={uploading > 0} />
+      ) : (
+        <>
       {formError && (
         <p className="form-error" role="alert">
           {formError}
@@ -111,6 +151,35 @@ export function ResourceForm({ resource, buckets, row, preset, onSaved, onCancel
           {uploading > 0 ? 'Menunggu upload…' : isNew ? 'Tambahkan' : 'Simpan perubahan'}
         </button>
       </div>
+        </>
+      )}
     </form>
+  )
+}
+
+const timeFormat = new Intl.DateTimeFormat('id-ID', { hour: '2-digit', minute: '2-digit' })
+
+/** Bilah status simpan otomatis yang selalu terlihat di bawah layar. */
+function AutoSaveBar({ auto, uploading }: { auto: AutoSave; uploading: boolean }) {
+  const label = uploading
+    ? 'Menunggu upload selesai…'
+    : auto.status === 'saving'
+      ? 'Menyimpan…'
+      : auto.status === 'error'
+        ? `Belum tersimpan: ${auto.error}`
+        : auto.dirty
+          ? 'Ada perubahan — disimpan otomatis sebentar lagi'
+          : auto.savedAt
+            ? `Semua perubahan tersimpan · ${timeFormat.format(auto.savedAt)}`
+            : 'Perubahan disimpan otomatis'
+  return (
+    <div className="autosave-bar" data-status={uploading ? 'pending' : auto.status} role="status" aria-live="polite">
+      <span className="autosave-dot" aria-hidden />
+      <span className="autosave-label">{label}</span>
+      <button type="submit" className="btn btn-primary" disabled={!auto.dirty || auto.status === 'saving' || uploading}>
+        {auto.status === 'saving' && <span className="spinner" aria-hidden />}
+        Simpan sekarang
+      </button>
+    </div>
   )
 }

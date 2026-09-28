@@ -23,7 +23,6 @@ var (
 
 // Kelompok field di form Informasi Gereja.
 const (
-	sectionMenu     = "Kartu di menu Gereja"
 	sectionVisiMisi = "Visi dan Misi"
 	sectionSejarah  = "Sejarah"
 	sectionPotret   = "Potret Diri"
@@ -191,6 +190,24 @@ var All = []Resource{
 
 	// ── Profil Gereja ──────────────────────────────────────────────
 	{
+		Label:       "Cover Menu Gereja",
+		Group:       GroupProfil,
+		Description: "Gambar besar di tiap menu halaman Gereja (rasio 16:9). Menyimpan menu yang sama akan mengganti cover lama.",
+		Columns:     []string{"image_url", "key"},
+		TitleField:  "key",
+		Path:        "gereja-covers",
+		Table:       "gereja_covers",
+		Fields: []Field{
+			{Name: "key", Type: Text, Required: true, Label: "Menu", Input: InputSelect, OneOf: []string{
+				"informasi_gereja", "kependetaan", "kemajelisan", "bpm", "perwilayahan", "profil_ruangan",
+			}},
+			{Name: "image_url", Type: Text, Required: true, URL: true, MaxLen: 1000,
+				Label: "Gambar", Input: InputImage, Upload: "gereja-covers", Image: wide16x9},
+		},
+		OrderBy:   "key ASC",
+		UpsertKey: "key",
+	},
+	{
 		Label:     "Informasi Gereja",
 		Group:     GroupProfil,
 		Path:      "informasi-gereja",
@@ -199,10 +216,6 @@ var All = []Resource{
 		Description: "Di aplikasi, halaman ini tampil sebagai tiga kartu bergambar: Visi dan Misi, Sejarah, dan Potret Diri. " +
 			"Foto tiap bagian menjadi gambar kartu sekaligus gambar utama saat kartu dibuka.",
 		Fields: []Field{
-			{Name: "cover_foto", Type: Text, URL: true, MaxLen: 1000, Label: "Foto kartu Informasi Gereja",
-				Help:  "Gambar kartu \"Informasi Gereja\" di halaman Gereja aplikasi",
-				Input: InputImage, Upload: "gereja-covers", Image: kartuProfil, Section: sectionMenu},
-
 			{Name: "visi_misi_foto", Type: Text, URL: true, MaxLen: 1000, Label: "Foto kartu",
 				Input: InputImage, Upload: "profil", Image: kartuProfil, Section: sectionVisiMisi},
 			{Name: "visi", Type: Text, Label: "Visi", Input: InputTextarea, Section: sectionVisiMisi},
@@ -219,24 +232,6 @@ var All = []Resource{
 			{Name: "potret_diri", Type: Text, Label: "Potret diri", Input: InputTextarea, Section: sectionPotret,
 				Help: "Gambaran jemaat saat ini: jumlah warga, wilayah, pelayanan, dll. Pisahkan paragraf dengan baris kosong"},
 		},
-	},
-	{
-		Label:       "Cover Menu Gereja",
-		Group:       GroupProfil,
-		Description: "Gambar besar di tiap menu halaman Gereja (rasio 16:9). Menyimpan menu yang sama akan mengganti cover lama.",
-		Columns:     []string{"image_url", "key"},
-		TitleField:  "key",
-		Path:        "gereja-covers",
-		Table:       "gereja_covers",
-		Fields: []Field{
-			{Name: "key", Type: Text, Required: true, Label: "Menu", Input: InputSelect, OneOf: []string{
-				"kependetaan", "kemajelisan", "bpm", "perwilayahan", "profil_ruangan",
-			}},
-			{Name: "image_url", Type: Text, Required: true, URL: true, MaxLen: 1000,
-				Label: "Gambar", Input: InputImage, Upload: "gereja-covers", Image: wide16x9},
-		},
-		OrderBy:   "key ASC",
-		UpsertKey: "key",
 	},
 	profilResource("kependetaan", "Kependetaan"),
 	profilResource("kemajelisan", "Kemajelisan"),

@@ -16,9 +16,6 @@ import (
 // dilewati (lebih baik diunggah ulang daripada tampil sebagai link rusak).
 var deadFileHosts = []string{".supabase.co/"}
 
-// infoGerejaCoverKey adalah id dokumen cover kartu Informasi Gereja di koleksi lama gereja_covers.
-const infoGerejaCoverKey = "informasi_gereja"
-
 // Migrator memindahkan data lama dari Firestore ke database baru.
 type Migrator struct {
 	Pool      *pgxpool.Pool
@@ -78,12 +75,7 @@ func jobs() []job {
 		{target: "siaran", collection: "siaran", transform: func(d Doc) (map[string]any, bool) { return d.Fields, true }},
 		{target: "gereja-covers", collection: "gereja_covers", transform: func(d Doc) (map[string]any, bool) {
 			u, _ := d.Fields["imageUrl"].(string)
-			return map[string]any{"key": d.ID, "image_url": u}, u != "" && d.ID != infoGerejaCoverKey
-		}},
-		// Cover kartu Informasi Gereja kini disimpan di data Informasi Gereja.
-		{target: "informasi-gereja", collection: "gereja_covers", transform: func(d Doc) (map[string]any, bool) {
-			u, _ := d.Fields["imageUrl"].(string)
-			return map[string]any{"cover_foto": u}, u != "" && d.ID == infoGerejaCoverKey
+			return map[string]any{"key": d.ID, "image_url": u}, u != ""
 		}},
 	}
 }
@@ -109,9 +101,6 @@ func (m *Migrator) runJob(ctx context.Context, j job) (TableReport, error) {
 		}
 	}
 	rep.Read = len(rows)
-	if res.Singleton {
-		return m.runSingleton(ctx, res, rows, rep)
-	}
 
 	// Idempoten: jangan menimpa data yang sudah ada (dokumen dicek per kategori).
 	kategori := ""
@@ -144,44 +133,6 @@ func (m *Migrator) runJob(ctx context.Context, j job) (TableReport, error) {
 		if err := m.insert(ctx, res, values, row["created_at"]); err != nil {
 			rep.Skipped = append(rep.Skipped, label+": "+err.Error())
 			continue
-		}
-		rep.Imported++
-	}
-	return rep, nil
-}
-
-// runSingleton mengisi kolom data satu-baris yang masih kosong (tidak menimpa isian admin).
-func (m *Migrator) runSingleton(ctx context.Context, res resource.Resource, rows []map[string]any, rep TableReport) (TableReport, error) {
-	current, err := m.store.GetSingleton(ctx, res)
-	if err != nil {
-		return rep, err
-	}
-	for i, row := range rows {
-		label := fmt.Sprintf("baris %d", i+1)
-		input := map[string]any{}
-		for k, v := range pickFields(res, row) {
-			if current[k] == nil {
-				input[k] = v
-			}
-		}
-		if len(input) == 0 {
-			rep.Note = "dilewati: " + res.Table + " sudah terisi"
-			continue
-		}
-		if field, dead := deadFileField(input); dead {
-			rep.Skipped = append(rep.Skipped, label+": file "+field+" ada di penyimpanan lama yang sudah dihapus — unggah ulang lewat website admin")
-			continue
-		}
-		values, errs := res.Validate(input, resource.Update)
-		if errs != nil {
-			rep.Skipped = append(rep.Skipped, label+": "+formatErrs(errs))
-			continue
-		}
-		if !m.DryRun {
-			if current, err = m.store.PutSingleton(ctx, res, values); err != nil {
-				rep.Skipped = append(rep.Skipped, label+": "+err.Error())
-				continue
-			}
 		}
 		rep.Imported++
 	}
