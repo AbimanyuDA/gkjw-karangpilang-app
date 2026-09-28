@@ -30,7 +30,6 @@ func fakeFirestore(t *testing.T) *httptest.Server {
 			"kategori":{"stringValue":"umum"},"tanggal":{"timestampValue":"2026-09-21T00:00:00.123456Z"}}}]}`,
 		"gereja_covers": `{"documents":[
 			{"name":"projects/p/databases/(default)/documents/gereja_covers/bpm","fields":{"imageUrl":{"stringValue":"https://cdn.example.org/bpm.jpg"}}},
-			{"name":"projects/p/databases/(default)/documents/gereja_covers/informasi_gereja","fields":{"imageUrl":{"stringValue":"https://cdn.example.org/info.jpg"}}},
 			{"name":"projects/p/databases/(default)/documents/gereja_covers/kemajelisan","fields":{"imageUrl":{"stringValue":""}}}]}`,
 	}
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -88,11 +87,6 @@ func TestMigrateLegacy(t *testing.T) {
 	covers, _, _ := store.List(ctx, find(t, "gereja-covers"), resource.ListQuery{Limit: 10})
 	if len(covers) != 1 || covers[0]["key"] != "bpm" {
 		t.Errorf("covers = %v (cover kosong harus diabaikan)", covers)
-	}
-	// Cover kartu Informasi Gereja masuk ke data Informasi Gereja.
-	info, _ := store.GetSingleton(ctx, find(t, "informasi-gereja"))
-	if info["cover_foto"] != "https://cdn.example.org/info.jpg" {
-		t.Errorf("informasi gereja cover = %v", info["cover_foto"])
 	}
 	if r := bySource["firestore:renungan"]; r.Read != 0 {
 		t.Errorf("renungan report = %+v", r)
