@@ -19,101 +19,164 @@ class ProfilBagianScreen extends ConsumerWidget {
     final judul = bagian.judul;
     final isi = bagian.isi(info);
 
-    return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            pinned: true,
-            expandedHeight: MediaQuery.sizeOf(context).width * 9 / 16,
-            backgroundColor: AppColors.navy900,
-            foregroundColor: Colors.white,
-            systemOverlayStyle: SystemUiOverlayStyle.light,
-            // Judul cukup di bawah foto; di atas foto hanya tombol kembali berlatar
-            // gelap agar tetap terlihat di foto yang terang.
-            leading: Padding(
-              padding: const EdgeInsets.all(6),
-              child: DecoratedBox(
-                decoration: const BoxDecoration(
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      // Ikon status bar putih karena bagian atas selalu berupa foto.
+      value: SystemUiOverlayStyle.light,
+      child: Scaffold(
+        body: CustomScrollView(
+          slivers: [
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: _FotoHeader(
+                heroTag: 'profil-${bagian.slug}',
+                url: bagian.foto(info),
+                topPadding: MediaQuery.paddingOf(context).top,
+                fullHeight: MediaQuery.sizeOf(context).width * 9 / 16,
+              ),
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(22, 24, 22, 120),
+              sliver: SliverList.list(
+                children: [
+                  Text(
+                    judul,
+                    style: TextStyle(
+                      fontFamily: AppFonts.display,
+                      fontSize: 26,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.heading,
+                      height: 1.25,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Container(
+                      width: 40,
+                      height: 3,
+                      decoration: BoxDecoration(
+                        color: AppColors.gold600,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  if (isi.isEmpty)
+                    Text(
+                      'Informasi belum tersedia.',
+                      style: TextStyle(
+                        fontFamily: 'PlusJakartaSans',
+                        fontSize: 14,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  for (final bagianIsi in isi) ...[
+                    if (bagianIsi.judul != null) _SubJudul(bagianIsi.judul!),
+                    if (bagian == ProfilBagian.visiMisi &&
+                        bagianIsi.judul == 'Misi')
+                      _DaftarPoin(bagianIsi.isi)
+                    else
+                      _Paragraf(bagianIsi.isi),
+                    const SizedBox(height: 24),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Foto di atas halaman: saat digulir, foto mengecil (tetap terlihat, dipotong
+/// menyesuaikan tinggi, dan makin redup) hingga menjadi pita foto di bawah status bar.
+class _FotoHeader extends SliverPersistentHeaderDelegate {
+  final Object heroTag;
+  final String? url;
+  final double topPadding;
+  final double fullHeight;
+
+  const _FotoHeader({
+    required this.heroTag,
+    required this.url,
+    required this.topPadding,
+    required this.fullHeight,
+  });
+
+  static const _radius = 24.0;
+
+  @override
+  double get maxExtent => fullHeight + topPadding;
+
+  @override
+  double get minExtent => topPadding + kToolbarHeight + 44;
+
+  @override
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    // 0 = foto penuh, 1 = sudah mengecil sepenuhnya.
+    final t = (shrinkOffset / (maxExtent - minExtent)).clamp(0.0, 1.0);
+    final radius = Radius.circular(_radius * t);
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.vertical(bottom: radius),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.navy900.withValues(alpha: 0.25 * t),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.vertical(bottom: radius),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Hero(
+              tag: heroTag,
+              child: ProfilFoto(url: url),
+            ),
+            // Saat mengecil, foto diredupkan dengan lapisan navy — foto tetap
+            // terlihat, bukan berganti menjadi bar biru polos.
+            ColoredBox(color: AppColors.navy900.withValues(alpha: 0.45 * t)),
+            // Bayangan atas agar tombol kembali & status bar tetap terbaca di foto terang.
+            const DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.center,
+                  colors: [Colors.black54, Colors.transparent],
+                ),
+              ),
+            ),
+            Positioned(
+              top: topPadding + 6,
+              left: 12,
+              child: const DecoratedBox(
+                decoration: BoxDecoration(
                   color: Colors.black38,
                   shape: BoxShape.circle,
                 ),
                 child: BackButton(color: Colors.white),
               ),
             ),
-            flexibleSpace: FlexibleSpaceBar(
-              background: Stack(
-                fit: StackFit.expand,
-                children: [
-                  Hero(
-                    tag: 'profil-${bagian.slug}',
-                    child: ProfilFoto(url: bagian.foto(info)),
-                  ),
-                  // Bayangan atas agar tombol kembali & judul tetap terbaca di foto terang.
-                  const DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.center,
-                        colors: [Colors.black54, Colors.transparent],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(22, 24, 22, 120),
-            sliver: SliverList.list(
-              children: [
-                Text(
-                  judul,
-                  style: TextStyle(
-                    fontFamily: AppFonts.display,
-                    fontSize: 26,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.heading,
-                    height: 1.25,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Container(
-                    width: 40,
-                    height: 3,
-                    decoration: BoxDecoration(
-                      color: AppColors.gold600,
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                if (isi.isEmpty)
-                  Text(
-                    'Informasi belum tersedia.',
-                    style: TextStyle(
-                      fontFamily: 'PlusJakartaSans',
-                      fontSize: 14,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                for (final bagianIsi in isi) ...[
-                  if (bagianIsi.judul != null) _SubJudul(bagianIsi.judul!),
-                  if (bagian == ProfilBagian.visiMisi &&
-                      bagianIsi.judul == 'Misi')
-                    _DaftarPoin(bagianIsi.isi)
-                  else
-                    _Paragraf(bagianIsi.isi),
-                  const SizedBox(height: 24),
-                ],
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
+
+  @override
+  bool shouldRebuild(_FotoHeader old) =>
+      old.url != url ||
+      old.heroTag != heroTag ||
+      old.topPadding != topPadding ||
+      old.fullHeight != fullHeight;
 }
 
 class _SubJudul extends StatelessWidget {
