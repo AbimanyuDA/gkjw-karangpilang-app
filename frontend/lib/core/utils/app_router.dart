@@ -1,0 +1,103 @@
+// lib/core/utils/app_router.dart
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../features/splash/screens/splash_screen.dart';
+import '../../features/beranda/screens/beranda_screen.dart';
+import '../../features/beranda/screens/warta_screen.dart';
+import '../../features/beranda/screens/tata_ibadah_screen.dart';
+import '../../features/beranda/screens/renungan_screen.dart';
+import '../../features/beranda/screens/agenda_screen.dart';
+import '../../features/beranda/screens/galeri_screen.dart';
+import '../../features/beranda/screens/persembahan_screen.dart';
+import '../../features/beranda/screens/eperpus_screen.dart';
+import '../../features/beranda/screens/inspirasi_screen.dart';
+import '../../features/siaran/screens/siaran_screen.dart';
+import '../../features/gereja/screens/gereja_screen.dart';
+import '../../features/gereja/screens/informasi_gereja_screen.dart';
+import '../../features/gereja/screens/profil_bagian_screen.dart';
+import '../../features/gereja/models/profil_bagian.dart';
+import '../../features/gereja/screens/kependetaan_screen.dart';
+import '../../features/gereja/screens/kemajelisan_screen.dart';
+import '../../features/gereja/screens/bpm_screen.dart';
+import '../../features/gereja/screens/perwilayahan_screen.dart';
+import '../../features/gereja/screens/profil_ruangan_screen.dart';
+import '../../features/informasi/screens/informasi_screen.dart';
+import '../../features/informasi/screens/notifikasi_screen.dart';
+import '../../features/informasi/screens/hubungi_kami_screen.dart';
+import '../../features/informasi/screens/tentang_screen.dart';
+import '../../features/informasi/screens/faq_screen.dart';
+import '../widgets/main_shell.dart';
+
+final _rootNavigatorKey = GlobalKey<NavigatorState>();
+final _shellNavigatorKey = GlobalKey<NavigatorState>();
+
+GoRouter createAppRouter() => GoRouter(
+  navigatorKey: _rootNavigatorKey,
+  initialLocation: '/splash',
+  routes: [
+    GoRoute(
+      path: '/splash',
+      builder: (context, state) => const SplashScreen(),
+    ),
+    ShellRoute(
+      navigatorKey: _shellNavigatorKey,
+      builder: (context, state, child) => MainShell(child: child),
+      routes: [
+        GoRoute(
+          path: '/beranda',
+          pageBuilder: (context, state) => const NoTransitionPage(child: BerandaScreen()),
+          routes: [
+            GoRoute(path: 'warta', builder: (c, s) => const WartaScreen()),
+            GoRoute(path: 'tata-ibadah', builder: (c, s) => const TataIbadahScreen()),
+            GoRoute(path: 'renungan', builder: (c, s) => const RenunganScreen()),
+            GoRoute(path: 'agenda', builder: (c, s) => const AgendaScreen()),
+            GoRoute(path: 'galeri', builder: (c, s) => const GaleriScreen()),
+            GoRoute(path: 'persembahan', builder: (c, s) => const PersembahanScreen()),
+            GoRoute(path: 'eperpus', builder: (c, s) => const EperpusScreen()),
+            GoRoute(path: 'inspirasi', builder: (c, s) => const InspirasiScreen()),
+          ],
+        ),
+        GoRoute(
+          path: '/siaran',
+          pageBuilder: (context, state) => const NoTransitionPage(child: SiaranScreen()),
+        ),
+        GoRoute(
+          path: '/gereja',
+          pageBuilder: (context, state) => const NoTransitionPage(child: GerejaScreen()),
+          routes: [
+            GoRoute(
+              path: 'informasi',
+              builder: (c, s) => const InformasiGerejaScreen(),
+              routes: [
+                // /gereja/informasi/{visi-misi|sejarah|potret-diri}
+                GoRoute(
+                  path: ':bagian',
+                  redirect: (c, s) =>
+                      ProfilBagian.fromSlug(s.pathParameters['bagian']) == null ? '/gereja/informasi' : null,
+                  builder: (c, s) =>
+                      ProfilBagianScreen(bagian: ProfilBagian.fromSlug(s.pathParameters['bagian'])!),
+                ),
+              ],
+            ),
+            GoRoute(path: 'kependetaan', builder: (c, s) => const KependetaanScreen()),
+            GoRoute(path: 'kemajelisan', builder: (c, s) => const KemajelisanScreen()),
+            GoRoute(path: 'bpm', builder: (c, s) => const BpmScreen()),
+            GoRoute(path: 'perwilayahan', builder: (c, s) => const PerwilayahanScreen()),
+            GoRoute(path: 'profil-ruangan', builder: (c, s) => const ProfilRuanganScreen()),
+          ],
+        ),
+        GoRoute(
+          path: '/informasi',
+          pageBuilder: (context, state) => const NoTransitionPage(child: InformasiScreen()),
+          routes: [
+            GoRoute(path: 'notifikasi', builder: (c, s) => const NotifikasiScreen()),
+            GoRoute(path: 'hubungi', builder: (c, s) => const HubungiKamiScreen()),
+            GoRoute(path: 'tentang', builder: (c, s) => const TentangScreen()),
+            GoRoute(path: 'faq', builder: (c, s) => const FaqScreen()),
+          ],
+        ),
+      ],
+    ),
+  ],
+);

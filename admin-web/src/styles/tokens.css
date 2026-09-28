@@ -1,0 +1,125 @@
+/* Token desain — sama dengan website GKJW Karangpilang (GKJW-LandingPage/src/styles/tokens.css). */
+:root {
+  --navy-950: #06142a;
+  --navy-900: #0b1f3a;
+  --navy-800: #122b4d;
+  --navy-700: #1c3a63;
+  --gold-300: #f3d58a;
+  --gold-400: #e9bd55;
+  --gold-500: #d9a23a;
+  --gold-600: #b5842a;
+  --gold-700: #8a6420;
+  --ivory-50: #fdfaf3;
+  --ivory-100: #f8f2e4;
+  --ivory-200: #efe5cf;
+  --ink-900: #16202e;
+  --ink-700: #3a4658;
+  --ink-500: #677285;
+
+  /* Peran — tema terang (cream dominan) */
+  --bg: var(--ivory-100);
+  --surface: var(--ivory-50);
+  --card: #ffffff;
+  --sunken: var(--ivory-200);
+  --text: var(--ink-900);
+  --text-muted: var(--ink-700);
+  --text-subtle: var(--ink-500);
+  --heading: var(--navy-900);
+  --accent: var(--gold-500);
+  --accent-text: var(--gold-700);
+  --line: rgb(22 32 46 / 0.1);
+  --line-strong: rgb(22 32 46 / 0.18);
+  --nav-active-bg: var(--navy-900);
+  --nav-active-text: var(--ivory-50);
+  --focus: var(--gold-500);
+  --danger: #b3261e;
+  --danger-bg: #fbe9e7;
+  --ok: #2e7d4f;
+  --ok-bg: #e6f2ea;
+  --shadow-card: 0 1px 2px rgb(11 31 58 / 0.05), 0 8px 24px -14px rgb(11 31 58 / 0.22);
+  --shadow-lift: 0 2px 4px rgb(11 31 58 / 0.06), 0 24px 48px -20px rgb(11 31 58 / 0.4);
+
+  --font-display: 'Source Serif 4', Georgia, serif;
+  --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 0.95rem;
+  --text-lg: 1.125rem;
+  --text-h2: clamp(1.6rem, 1.3rem + 1vw, 2.1rem);
+  --text-hero: clamp(2rem, 1.4rem + 2.4vw, 3.1rem);
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-pill: 999px;
+
+  --duration-fast: 150ms;
+  --duration-normal: 280ms;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Kawung — motif batik Jawa, tekstur tipis seperti di website. */
+  --pattern-kawung: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Cg fill='none' stroke='%23b5842a' stroke-width='1'%3E%3Cellipse cx='32' cy='14' rx='8' ry='13'/%3E%3Cellipse cx='32' cy='50' rx='8' ry='13'/%3E%3Cellipse cx='14' cy='32' rx='13' ry='8'/%3E%3Cellipse cx='50' cy='32' rx='13' ry='8'/%3E%3Ccircle cx='32' cy='32' r='2'/%3E%3C/g%3E%3C/svg%3E");
+  --pattern-opacity: 0.07;
+
+  color-scheme: light;
+}
+
+/* Tema gelap — navy (nilai dari mode gelap website). */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #0a1422;
+    --surface: #0e1a2c;
+    --card: #15233a;
+    --sunken: #1a2c49;
+    --text: #ece6d8;
+    --text-muted: #c2bdb0;
+    --text-subtle: #9aa2b1;
+    --heading: var(--ivory-50);
+    --accent: var(--gold-400);
+    --accent-text: var(--gold-400);
+    --line: rgb(243 213 138 / 0.12);
+    --line-strong: rgb(243 213 138 / 0.22);
+    --nav-active-bg: var(--navy-700);
+    --nav-active-text: var(--ivory-50);
+    --danger: #f2b8b5;
+    --danger-bg: rgb(242 184 181 / 0.12);
+    --ok: #81c995;
+    --ok-bg: rgb(129 201 149 / 0.12);
+    --shadow-card: 0 1px 2px rgb(0 0 0 / 0.3);
+    --shadow-lift: 0 24px 48px -20px rgb(0 0 0 / 0.7);
+    --pattern-opacity: 0.05;
+    color-scheme: dark;
+  }
+}
+:root[data-theme='dark'] {
+  --bg: #0a1422;
+  --surface: #0e1a2c;
+  --card: #15233a;
+  --sunken: #1a2c49;
+  --text: #ece6d8;
+  --text-muted: #c2bdb0;
+  --text-subtle: #9aa2b1;
+  --heading: var(--ivory-50);
+  --accent: var(--gold-400);
+  --accent-text: var(--gold-400);
+  --line: rgb(243 213 138 / 0.12);
+  --line-strong: rgb(243 213 138 / 0.22);
+  --nav-active-bg: var(--navy-700);
+  --nav-active-text: var(--ivory-50);
+  --danger: #f2b8b5;
+  --danger-bg: rgb(242 184 181 / 0.12);
+  --ok: #81c995;
+  --ok-bg: rgb(129 201 149 / 0.12);
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.3);
+  --shadow-lift: 0 24px 48px -20px rgb(0 0 0 / 0.7);
+  --pattern-opacity: 0.05;
+  color-scheme: dark;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-normal: 0ms;
+  }
+}
