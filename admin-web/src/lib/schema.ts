@@ -16,6 +16,21 @@ export type InputKind =
   | 'date'
   | 'youtube'
 
+/** Panduan ukuran gambar sesuai tampilan di aplikasi. */
+export interface ImageSpec {
+  aspect_w: number
+  aspect_h: number
+  width: number
+  height: number
+  min_width: number
+  min_height: number
+  note?: string
+  /** Wajib dipotong ke rasio ini sebelum diunggah. */
+  crop: boolean
+  /** Ditampilkan dalam lingkaran di aplikasi. */
+  round: boolean
+}
+
 export interface FieldSchema {
   name: string
   label: string
@@ -30,6 +45,7 @@ export interface FieldSchema {
   max?: number
   pattern?: string
   upload?: string
+  image?: ImageSpec
 }
 
 export interface ResourceSchema {

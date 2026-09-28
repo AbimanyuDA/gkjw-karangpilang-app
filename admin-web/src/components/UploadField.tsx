@@ -1,9 +1,11 @@
 import { useId, useRef, useState } from 'react'
 import { FileText, ImagePlus, Trash2, Upload } from 'lucide-react'
 import { ApiError, upload } from '../lib/api'
+import { loadImage, specLabel, uncroppedWarning } from '../lib/crop'
 import { formatBytes } from '../lib/format'
 import { compressImage } from '../lib/image'
 import type { BucketSchema, FieldSchema } from '../lib/schema'
+import { CropDialog } from './CropDialog'
 
 interface Props {
   field: FieldSchema
@@ -22,12 +24,54 @@ export function UploadField({ field, bucket, value, onChange, onBusyChange }: Pr
   const [progress, setProgress] = useState<number | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [dragOver, setDragOver] = useState(false)
+  const [warning, setWarning] = useState<string | null>(null)
+  // Gambar yang sedang dipotong sebelum diunggah. Object URL dibuat saat foto
+  // dipilih dan baru dihapus setelah pemotongan selesai/dibatalkan.
+  const [cropping, setCropping] = useState<{ file: File; url: string } | null>(null)
   const kind = field.input === 'pdf' ? 'pdf' : 'image'
+  const spec = field.image
 
-  async function handle(file: File | undefined) {
+  function handle(file: File | undefined) {
     if (!file || !field.upload) return
     setError(null)
-    const payload = kind === 'image' ? await compressImage(file) : file
+    setWarning(null)
+    if (kind === 'image' && !file.type.startsWith('image/')) {
+      setError('Pilih file gambar (JPG, PNG, atau WebP).')
+      return
+    }
+    // Gambar dengan panduan ukuran dipotong dulu sesuai area yang tampil di aplikasi.
+    if (kind === 'image' && spec) {
+      setCropping({ file, url: URL.createObjectURL(file) })
+      return
+    }
+    void send(file, kind === 'image')
+  }
+
+  function finishCropping() {
+    if (cropping) URL.revokeObjectURL(cropping.url)
+    setCropping(null)
+    if (input.current) input.current.value = ''
+  }
+
+  async function uploadOriginal(file: File) {
+    finishCropping()
+    if (spec) {
+      const url = URL.createObjectURL(file)
+      try {
+        const img = await loadImage(url)
+        setWarning(uncroppedWarning(img.naturalWidth, img.naturalHeight, spec))
+      } catch {
+        /* peringatan ukuran hanya informasi — lanjutkan upload */
+      } finally {
+        URL.revokeObjectURL(url)
+      }
+    }
+    await send(file, true)
+  }
+
+  async function send(source: Blob, compress: boolean) {
+    if (!field.upload) return
+    const payload = compress && source instanceof File ? await compressImage(source) : source
     if (bucket && payload.size > bucket.max_bytes) {
       setError(`Ukuran file ${formatBytes(payload.size)} — maksimal ${formatBytes(bucket.max_bytes)}.`)
       return
@@ -52,7 +96,14 @@ export function UploadField({ field, bucket, value, onChange, onBusyChange }: Pr
       {value ? (
         <div className="upload-preview">
           {kind === 'image' ? (
-            <img src={value} alt={`Pratinjau ${field.label.toLowerCase()}`} />
+            // Bingkai seukuran tampilan di aplikasi, agar terlihat bagian yang terpotong.
+            <div
+              className="upload-frame"
+              data-round={spec?.round || undefined}
+              style={spec ? { aspectRatio: `${spec.aspect_w} / ${spec.aspect_h}` } : undefined}
+            >
+              <img src={value} alt={`Pratinjau ${field.label.toLowerCase()}`} />
+            </div>
           ) : (
             <a href={value} target="_blank" rel="noreferrer" className="upload-file">
               <FileText size={22} aria-hidden />
@@ -93,6 +144,7 @@ export function UploadField({ field, bucket, value, onChange, onBusyChange }: Pr
             atau seret ke sini · {kind === 'image' ? 'JPG, PNG, WebP' : 'PDF'}
             {bucket ? ` · maks. ${formatBytes(bucket.max_bytes)}` : ''}
           </span>
+          {spec && <span className="upload-spec">{specLabel(spec)}</span>}
         </label>
       )}
 
@@ -112,6 +164,23 @@ export function UploadField({ field, bucket, value, onChange, onBusyChange }: Pr
         </div>
       )}
       {error && <p className="field-error">{error}</p>}
+      {warning && <p className="field-warning">{warning}</p>}
+      {spec && value && <p className="field-help">{specLabel(spec)}</p>}
+
+      {cropping && spec && (
+        <CropDialog
+          src={cropping.url}
+          fileType={cropping.file.type}
+          spec={spec}
+          label={field.label}
+          onDone={(blob) => {
+            finishCropping()
+            void send(blob, false)
+          }}
+          onUseOriginal={() => void uploadOriginal(cropping.file)}
+          onCancel={finishCropping}
+        />
+      )}
     </div>
   )
 }

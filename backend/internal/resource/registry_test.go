@@ -51,6 +51,13 @@ func TestRegistryConsistent(t *testing.T) {
 				if (f.Input == InputImage || f.Input == InputPDF) && f.Upload == "" {
 					t.Errorf("field %q butuh Upload bucket", f.Name)
 				}
+				if f.Image != nil && (f.Input != InputImage || f.Image.AspectW == 0 || f.Image.AspectH == 0 ||
+					f.Image.MinWidth > f.Image.Width || f.Image.MinHeight > f.Image.Height) {
+					t.Errorf("field %q: ImageSpec tidak konsisten", f.Name)
+				}
+				if f.Input == InputImage && f.Image != nil && f.Image.Width*f.Image.AspectH != f.Image.Height*f.Image.AspectW {
+					t.Errorf("field %q: ukuran ideal %dx%d tidak sesuai rasio %d:%d", f.Name, f.Image.Width, f.Image.Height, f.Image.AspectW, f.Image.AspectH)
+				}
 				if f.Pattern != "" {
 					if _, err := regexp.Compile(f.Pattern); err != nil {
 						t.Errorf("Pattern %q tidak valid: %v", f.Name, err)
