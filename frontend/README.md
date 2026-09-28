@@ -35,83 +35,44 @@ Aplikasi mobile resmi **Gereja Kristen Jawi Wetan Jemaat Karangpilang** berbasis
 ### Menu Informasi
 - Notifikasi, Hubungi Kami, FAQ, Tentang Aplikasi
 
-### Admin Panel
-- CRUD semua konten (hanya untuk pengguna yang login)
+Konten dikelola lewat **website admin** (`../admin-web`), bukan dari aplikasi.
 
-## Setup
+### Tampilan
+- Tema terang (cream/emas) & gelap (navy), mengikuti HP atau dipilih di menu Informasi
 
-### 1. Firebase
-- Project: `gkjw-karangpilang-app`
-- `google-services.json` sudah ada di `android/app/`
-- `GoogleService-Info.plist` sudah ada di `ios/Runner/`
+## Menjalankan
 
-### 2. Supabase
-- Project: `GKJW Karangpilang +`
-- URL: `https://roocpiqogsnqqnfdokiv.supabase.co`
+Aplikasi membaca data dari backend Go (`../backend`). Dari root repo:
 
-### 3. Install Dependencies
 ```bash
-flutter pub get
+make dev        # backend lokal di http://localhost:8080
+make app-run    # emulator Android
+# simulator iOS:
+flutter run --dart-define-from-file=config/dev-ios.json
 ```
 
-### 4. Run
-```bash
-flutter run
-```
+Build rilis: isi `config/prod.json` dengan domain API, lalu `make app-build-apk` dari root repo.
 
 ## Struktur Proyek
 
 ```
 lib/
 ├── core/
-│   ├── constants/    # AppConstants (URL, keys, dsb)
-│   ├── theme/        # AppTheme, AppColors
-│   ├── utils/        # AppRouter
-│   └── widgets/      # Reusable widgets (PdfListScreen, ProfilListScreen)
+│   ├── config/       # alamat API (dari --dart-define-from-file)
+│   ├── theme/        # palet terang/gelap, font, pilihan tema
+│   ├── utils/        # router, cache PDF
+│   └── widgets/      # shell navigasi, daftar PDF, profil
 ├── data/
-│   ├── models/       # Data models Firestore & Supabase
-│   ├── repositories/ # Repository pattern
-│   └── services/     # FirestoreService, SupabaseService
-├── features/
-│   ├── auth/         # Splash, Login
-│   ├── beranda/      # Home + 8 menu
-│   ├── siaran/       # YouTube player
-│   ├── gereja/       # Profil gereja
-│   ├── informasi/    # Info & kontak
-│   └── admin/        # Admin dashboard
-├── providers/        # Riverpod providers
-├── firebase_options.dart
-└── main.dart
+│   ├── api/          # ApiClient (Dio) — hanya membaca
+│   ├── models/       # model konten
+│   └── services/     # ContentService, notifikasi sapaan
+├── features/         # beranda, siaran, gereja, informasi, splash
+└── providers/        # provider Riverpod
 ```
 
-## Database Architecture
+## Test
 
-### Firebase Firestore (dokumen/PDF/video)
-- `warta_jemaat` – Warta jemaat PDF
-- `tata_ibadah` – Tata ibadah PDF
-- `renungan` – Renungan harian PDF
-- `siaran` – Video ibadah (YouTube ID)
-- `users` – User profile
-
-### Supabase PostgreSQL (objek/relasional)
-- `galeri` – Foto galeri
-- `agenda` – Agenda kegiatan
-- `kependetaan` – Profil gembala
-- `kemajelisan` – Profil majelis
-- `bpm` – Badan Pembantu Majelis
-- `perwilayahan` – Data wilayah
-- `profil_ruangan` – Profil ruangan
-- `eperpus` – E-perpustakaan
-- `inspirasi` – Konten spin wheel
-- `informasi_gereja` – Profil gereja
-- `notifikasi` – Pengumuman
-- `faq` – FAQ
-- `hubungi_kami` – Kontak sosial
-- `tentang_aplikasi` – Tentang app
-
-## Admin Login
-
-Buat akun admin di Firebase Console:
-1. Buka Firebase Console → gkjw-karangpilang-app
-2. Authentication → Add User
-3. Masukkan email & password admin
+```bash
+flutter analyze && flutter test
+make app-e2e DEVICE=<id>   # dari root repo, butuh `make dev`
+```

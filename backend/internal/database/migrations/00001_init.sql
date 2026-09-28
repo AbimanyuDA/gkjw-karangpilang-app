@@ -1,5 +1,5 @@
 -- +goose Up
--- Skema awal: menggabungkan tabel Supabase lama dan koleksi Firestore
+-- Skema awal: menggabungkan tabel-tabel aplikasi lama dan koleksi Firestore
 -- (warta_jemaat, tata_ibadah, renungan → tabel `dokumen`; siaran; gereja_covers).
 
 CREATE TABLE admins (
