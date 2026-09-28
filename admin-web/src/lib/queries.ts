@@ -60,6 +60,15 @@ export function useSave(resource: ResourceSchema) {
   })
 }
 
+/** Simpan urutan baru hasil drag (id pertama = paling atas). */
+export function useReorder(resource: ResourceSchema) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (ids: string[]) => request(`/admin/${resource.path}/urutan`, { method: 'PUT', body: { ids } }),
+    onSettled: () => qc.invalidateQueries({ queryKey: ['list', resource.path] }),
+  })
+}
+
 export function useDelete(resource: ResourceSchema) {
   const qc = useQueryClient()
   return useMutation({

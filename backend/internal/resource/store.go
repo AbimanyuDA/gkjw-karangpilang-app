@@ -52,7 +52,16 @@ func (s *PgStore) Get(ctx context.Context, r Resource, id string, public bool) (
 }
 
 // Create menyisipkan baris baru (atau upsert bila Resource.UpsertKey diisi).
+// Pada resource yang bisa diurutkan, data baru tanpa urutan ditaruh paling akhir.
 func (s *PgStore) Create(ctx context.Context, r Resource, values Row) (Row, error) {
+	if _, given := values[SortField]; r.Sortable() && !given {
+		var next int64
+		q := fmt.Sprintf("SELECT COALESCE(MAX(%s) + 1, 0) FROM %s", SortField, r.Table)
+		if err := s.pool.QueryRow(ctx, q).Scan(&next); err != nil {
+			return nil, fmt.Errorf("hitung urutan %s: %w", r.Table, err)
+		}
+		values = withValue(values, SortField, next)
+	}
 	sql, args := r.buildInsert(values)
 	return s.one(ctx, r, sql, args)
 }
@@ -72,6 +81,30 @@ func (s *PgStore) Delete(ctx context.Context, r Resource, id string) error {
 	}
 	if tag.RowsAffected() == 0 {
 		return httpx.ErrNotFound
+	}
+	return nil
+}
+
+// Reorder menyimpan urutan baru: ids[0] mendapat urutan 0, dst. Semua atau tidak sama sekali.
+func (s *PgStore) Reorder(ctx context.Context, r Resource, ids []string) error {
+	tx, err := s.pool.Begin(ctx)
+	if err != nil {
+		return fmt.Errorf("mulai transaksi urutan: %w", err)
+	}
+	defer tx.Rollback(ctx) //nolint:errcheck // no-op setelah commit
+
+	sql := fmt.Sprintf("UPDATE %s SET %s = $1, updated_at = now() WHERE id = $2", r.Table, SortField)
+	for i, id := range ids {
+		tag, err := tx.Exec(ctx, sql, i, id)
+		if err != nil {
+			return mapPgError(fmt.Errorf("urutkan %s: %w", r.Table, err))
+		}
+		if tag.RowsAffected() == 0 {
+			return httpx.ErrNotFound
+		}
+	}
+	if err := tx.Commit(ctx); err != nil {
+		return fmt.Errorf("simpan urutan %s: %w", r.Table, err)
 	}
 	return nil
 }
@@ -142,4 +175,14 @@ func mapPgError(err error) error {
 		return httpx.ErrNotFound
 	}
 	return err
+}
+
+// withValue mengembalikan salinan values dengan satu kolom ditambahkan (tanpa mengubah aslinya).
+func withValue(values Row, key string, v any) Row {
+	out := make(Row, len(values)+1)
+	for k, val := range values {
+		out[k] = val
+	}
+	out[key] = v
+	return out
 }

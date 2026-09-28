@@ -104,4 +104,13 @@ func (r Resource) field(name string) (Field, bool) {
 	return Field{}, false
 }
 
+// Sortable: resource punya kolom "urutan" sehingga admin bisa mengurutkan dengan drag.
+func (r Resource) Sortable() bool {
+	_, ok := r.field(SortField)
+	return ok && !r.Singleton
+}
+
+// SortField adalah nama kolom urutan.
+const SortField = "urutan"
+
 func intPtr(v int) *int { return &v }

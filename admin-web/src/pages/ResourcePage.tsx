@@ -3,11 +3,12 @@ import { useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { ChevronLeft, ChevronRight, FileText, Pencil, Plus, Trash2 } from 'lucide-react'
 import { ConfirmDialog, Drawer } from '../components/Dialogs'
+import { SortableRows } from '../components/SortableRows'
 import { ResourceForm } from '../components/ResourceForm'
 import { useToast } from '../lib/toast'
 import { deleteUploadedFile, request } from '../lib/api'
 import { formatDate, optionLabel } from '../lib/format'
-import { PAGE_SIZE, useDelete, useList } from '../lib/queries'
+import { PAGE_SIZE, useDelete, useList, useReorder } from '../lib/queries'
 import { fieldOf, type AdminSchema, type FieldSchema, type ResourceSchema, type Row } from '../lib/schema'
 
 const PRESET_PREFIX = 'isi.' // ?baru=1&isi.kategori=warta&isi.tanggal=2026-10-04
@@ -21,11 +22,31 @@ export function ResourcePage({ resource, schema }: { resource: ResourceSchema; s
   // Filter berupa pilihan (mis. kategori) ditampilkan sebagai tab.
   const tabFilter = resource.filters.map((n) => fieldOf(resource, n)).find((f) => f?.options?.length)
   const activeTab = tabFilter ? (params.get(tabFilter.name) ?? '') : ''
-  const page = Math.max(1, Number(params.get('hal') ?? 1))
+  // Daftar yang diurutkan dengan drag ditampilkan utuh (tanpa halaman) agar semua bisa dipindah.
+  const sortable = resource.sortable
+  const page = sortable ? 1 : Math.max(1, Number(params.get('hal') ?? 1))
   const list = useList(resource.path, {
     offset: (page - 1) * PAGE_SIZE,
+    limit: sortable ? 200 : PAGE_SIZE,
     filters: tabFilter && activeTab ? { [tabFilter.name]: activeTab } : undefined,
   })
+  const reorder = useReorder(resource)
+  // Urutan sementara saat menyimpan hasil drag (tampil langsung, dibatalkan bila gagal).
+  const [pendingOrder, setPendingOrder] = useState<Row[] | null>(null)
+  const rows = pendingOrder ?? list.data?.rows ?? []
+  const columns = sortable ? resource.columns.filter((c) => c !== 'urutan') : resource.columns
+
+  async function saveOrder(next: Row[]) {
+    setPendingOrder(next)
+    try {
+      await reorder.mutateAsync(next.map((r) => r.id))
+      toast('Urutan disimpan')
+    } catch (e) {
+      toast(e instanceof Error ? `Urutan gagal disimpan: ${e.message}` : 'Urutan gagal disimpan', 'error')
+    } finally {
+      setPendingOrder(null)
+    }
+  }
 
   const editId = params.get('ubah')
   const creating = params.get('baru') === '1'
@@ -34,7 +55,7 @@ export function ResourcePage({ resource, schema }: { resource: ResourceSchema; s
   )
   if (creating && tabFilter && activeTab && !preset[tabFilter.name]) preset[tabFilter.name] = activeTab
 
-  const cachedRow = list.data?.rows.find((r) => r.id === editId)
+  const cachedRow = rows.find((r) => r.id === editId)
   const editing = useQuery({
     queryKey: ['row', resource.path, editId],
     queryFn: async () => (await request<Row>(`/admin/${resource.path}/${editId}`)).data,
@@ -80,9 +101,26 @@ export function ResourcePage({ resource, schema }: { resource: ResourceSchema; s
   }
 
   const total = list.data?.meta?.total ?? 0
-  const pages = Math.max(1, Math.ceil(total / PAGE_SIZE))
+  const pages = sortable ? 1 : Math.max(1, Math.ceil(total / PAGE_SIZE))
   const title = (row: Row) => String(row[resource.title_field ?? resource.columns[0]] ?? '(tanpa judul)')
   const itemLabel = tabFilter && activeTab ? optionLabel(activeTab) : resource.label
+  const renderCells = (row: Row) => (
+    <>
+      {columns.map((c) => (
+        <td key={c} data-kind={fieldOf(resource, c)?.input}>
+          <Cell field={fieldOf(resource, c)} value={row[c]} />
+        </td>
+      ))}
+      <td className="col-actions" onClick={(e) => e.stopPropagation()}>
+        <button className="btn btn-ghost btn-icon" aria-label={`Ubah ${title(row)}`} onClick={() => update({ ubah: row.id, baru: null })}>
+          <Pencil size={16} />
+        </button>
+        <button className="btn btn-ghost btn-icon danger" aria-label={`Hapus ${title(row)}`} onClick={() => setToDelete(row)}>
+          <Trash2 size={16} />
+        </button>
+      </td>
+    </>
+  )
 
   return (
     <div className="page">
@@ -91,6 +129,7 @@ export function ResourcePage({ resource, schema }: { resource: ResourceSchema; s
           <div className="eyebrow">{resource.group}</div>
           <h1>{resource.label}</h1>
           {resource.description && <p className="page-desc">{resource.description}</p>}
+          {sortable && rows.length > 1 && <p className="page-note">Seret ⠿ untuk mengubah urutan tampil di aplikasi.</p>}
         </div>
         <button className="btn btn-primary" onClick={() => update({ baru: '1', ubah: null })}>
           <Plus size={17} aria-hidden /> Tambah
@@ -128,10 +167,15 @@ export function ResourcePage({ resource, schema }: { resource: ResourceSchema; s
             </button>
           </div>
         ) : (
-          <table className="table">
+          <table className="table" data-sortable={sortable || undefined}>
             <thead>
               <tr>
-                {resource.columns.map((c) => (
+                {sortable && (
+                  <th scope="col" className="col-drag">
+                    <span className="visually-hidden">Urutan</span>
+                  </th>
+                )}
+                {columns.map((c) => (
                   <th key={c} scope="col" data-kind={fieldOf(resource, c)?.input}>
                     {fieldOf(resource, c)?.label ?? c}
                   </th>
@@ -141,25 +185,23 @@ export function ResourcePage({ resource, schema }: { resource: ResourceSchema; s
                 </th>
               </tr>
             </thead>
-            <tbody>
-              {list.data?.rows.map((row) => (
-                <tr key={row.id} onClick={() => update({ ubah: row.id, baru: null })}>
-                  {resource.columns.map((c) => (
-                    <td key={c} data-kind={fieldOf(resource, c)?.input}>
-                      <Cell field={fieldOf(resource, c)} value={row[c]} />
-                    </td>
-                  ))}
-                  <td className="col-actions" onClick={(e) => e.stopPropagation()}>
-                    <button className="btn btn-ghost btn-icon" aria-label={`Ubah ${title(row)}`} onClick={() => update({ ubah: row.id, baru: null })}>
-                      <Pencil size={16} />
-                    </button>
-                    <button className="btn btn-ghost btn-icon danger" aria-label={`Hapus ${title(row)}`} onClick={() => setToDelete(row)}>
-                      <Trash2 size={16} />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+            {sortable ? (
+              <SortableRows
+                rows={rows}
+                renderCells={renderCells}
+                label={title}
+                onRowClick={(row) => update({ ubah: row.id, baru: null })}
+                onReorder={saveOrder}
+              />
+            ) : (
+              <tbody>
+                {rows.map((row) => (
+                  <tr key={row.id} onClick={() => update({ ubah: row.id, baru: null })}>
+                    {renderCells(row)}
+                  </tr>
+                ))}
+              </tbody>
+            )}
           </table>
         )}
       </div>

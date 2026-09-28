@@ -55,6 +55,10 @@ func (f *fakeRepo) PutSingleton(_ context.Context, _ Resource, v Row) (Row, erro
 func (f *fakeRepo) DistinctInts(context.Context, Resource, string) ([]int64, error) {
 	return nil, f.err
 }
+func (f *fakeRepo) Reorder(_ context.Context, _ Resource, ids []string) error {
+	f.lastValues = Row{"ids": ids}
+	return f.err
+}
 
 func newRouter(repo Repository) http.Handler {
 	r := chi.NewRouter()
@@ -235,5 +239,32 @@ func TestDistinctRoute(t *testing.T) {
 	rec, _ := do(t, newRouter(&fakeRepo{}), "GET", "/public/galeri/tahun", "")
 	if rec.Code != http.StatusOK || !strings.Contains(rec.Body.String(), `"data":[]`) {
 		t.Errorf("status = %d body = %s", rec.Code, rec.Body)
+	}
+}
+
+func TestReorder(t *testing.T) {
+	repo := &fakeRepo{}
+	id2 := "7a1c1f4e-6a8e-4c43-9a57-2b1f4f7d9a11"
+	rec, env := do(t, newRouter(repo), "PUT", "/admin/banners/urutan", `{"ids":["`+validID+`","`+id2+`"]}`)
+	if rec.Code != http.StatusOK || !env.Success {
+		t.Fatalf("status = %d body = %s", rec.Code, rec.Body)
+	}
+	if ids := repo.lastValues["ids"].([]string); len(ids) != 2 || ids[1] != id2 {
+		t.Errorf("ids = %v", ids)
+	}
+
+	for name, body := range map[string]string{
+		"empty":     `{"ids":[]}`,
+		"duplicate": `{"ids":["` + validID + `","` + validID + `"]}`,
+		"not uuid":  `{"ids":["x"]}`,
+	} {
+		if rec, _ := do(t, newRouter(repo), "PUT", "/admin/banners/urutan", body); rec.Code != http.StatusBadRequest {
+			t.Errorf("%s: status = %d", name, rec.Code)
+		}
+	}
+
+	// Resource tanpa kolom urutan tidak punya endpoint ini (jatuh ke PUT /{id} → id tidak valid).
+	if rec, _ := do(t, newRouter(repo), "PUT", "/admin/agenda/urutan", `{"ids":["`+validID+`"]}`); rec.Code != http.StatusNotFound {
+		t.Errorf("agenda: status = %d", rec.Code)
 	}
 }

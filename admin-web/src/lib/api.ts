@@ -107,6 +107,8 @@ async function parse<T>(res: Response): Promise<{ data: T; meta?: Meta }> {
   try {
     body = await res.json()
   } catch {
+    if (res.status >= 502 && res.status <= 504)
+      throw new ApiError('Server sedang tidak bisa dihubungi — mungkin sedang diperbarui. Coba lagi sebentar.', 'unavailable', res.status)
     throw new ApiError(`Respons server tidak valid (${res.status})`, 'bad_response', res.status)
   }
   if (res.status === 401) {

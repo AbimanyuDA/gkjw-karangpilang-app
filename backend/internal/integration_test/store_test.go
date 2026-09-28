@@ -8,6 +8,7 @@ import (
 	"context"
 	"errors"
 	"os"
+	"strings"
 	"testing"
 	"time"
 
@@ -226,5 +227,48 @@ func TestAdminStore(t *testing.T) {
 	}
 	if _, err := admins.FindByEmail(ctx, "x@y.z"); !errors.Is(err, auth.ErrAdminNotFound) {
 		t.Errorf("unknown email: %v", err)
+	}
+}
+
+func TestReorder(t *testing.T) {
+	_, store := setup(t)
+	ctx := context.Background()
+	res := find(t, "faq")
+	var ids []string
+	for _, q := range []string{"A", "B", "C"} {
+		row, err := store.Create(ctx, res, resource.Row{"pertanyaan": q, "jawaban": "x"})
+		if err != nil {
+			t.Fatal(err)
+		}
+		ids = append(ids, row["id"].(string))
+	}
+	// Data baru tanpa urutan otomatis ditaruh paling akhir.
+	first, _ := store.Get(ctx, res, ids[0], false)
+	last, _ := store.Get(ctx, res, ids[2], false)
+	if first["urutan"] != int32(0) || last["urutan"] != int32(2) {
+		t.Fatalf("auto urutan = %v, %v", first["urutan"], last["urutan"])
+	}
+
+	// Balik urutan: C, A, B
+	if err := store.Reorder(ctx, res, []string{ids[2], ids[0], ids[1]}); err != nil {
+		t.Fatal(err)
+	}
+	rows, _, _ := store.List(ctx, res, resource.ListQuery{Limit: 10})
+	var got []string
+	for _, r := range rows {
+		got = append(got, r["pertanyaan"].(string))
+	}
+	if strings.Join(got, "") != "CAB" {
+		t.Errorf("order = %v, want C A B", got)
+	}
+
+	// Id tak dikenal → seluruh perubahan dibatalkan (transaksi).
+	err := store.Reorder(ctx, res, []string{ids[0], "6f1c1f4e-6a8e-4c43-9a57-2b1f4f7d9a10"})
+	if !errors.Is(err, httpx.ErrNotFound) {
+		t.Fatalf("err = %v", err)
+	}
+	rows, _, _ = store.List(ctx, res, resource.ListQuery{Limit: 10})
+	if rows[0]["pertanyaan"] != "C" {
+		t.Error("failed reorder must roll back")
 	}
 }
