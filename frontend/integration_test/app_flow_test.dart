@@ -7,9 +7,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:gkjw_karangpilang/main.dart' as app;
 
-
 /// pumpAndSettle tidak bisa dipakai: beranda punya animasi/timer yang terus berjalan.
-Future<void> pumpUntil(WidgetTester tester, Finder finder, {Duration timeout = const Duration(seconds: 20)}) async {
+Future<void> pumpUntil(
+  WidgetTester tester,
+  Finder finder, {
+  Duration timeout = const Duration(seconds: 20),
+}) async {
   final end = DateTime.now().add(timeout);
   while (DateTime.now().isBefore(end)) {
     await tester.pump(const Duration(milliseconds: 200));
@@ -56,6 +59,23 @@ void main() {
     await tester.tap(find.text('Siaran').last);
     await settle(tester, 3000);
     expect(find.textContaining('Gagal'), findsNothing);
+
+    // ── Gereja → Informasi Gereja: tiga kartu, masing-masing bisa dibuka ──
+    await tester.tap(find.text('Gereja').last);
+    await settle(tester, 1500);
+    await tester.tap(find.text('Informasi Gereja').first);
+    await pumpUntil(tester, find.text('Visi dan Misi'));
+    expect(find.textContaining('Sejarah GKJW'), findsOneWidget);
+    expect(find.text('Potret Diri'), findsOneWidget);
+    await settle(tester, 2500); // waktu untuk tangkapan layar
+    await tester.tap(find.text('Visi dan Misi'));
+    await settle(tester, 2500);
+    expect(find.text('Visi dan Misi'), findsWidgets);
+    await tester.tap(find.byType(BackButton));
+    await settle(tester);
+    await tester.tap(find.byType(BackButton));
+    await settle(tester);
+
     await tester.tap(find.text('Beranda').last);
     await pumpUntil(tester, find.text('Menu Utama'));
 

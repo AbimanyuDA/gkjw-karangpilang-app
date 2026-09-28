@@ -13,7 +13,7 @@ class GerejaScreen extends ConsumerWidget {
     _GerejaMenuItem(
       key: 'informasi_gereja',
       title: 'Informasi Gereja',
-      subtitle: 'Profil, visi, dan misi gereja',
+      subtitle: 'Visi dan misi, sejarah, potret diri',
       route: '/gereja/informasi',
       accentColor: AppColors.navy700,
     ),

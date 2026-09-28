@@ -180,6 +180,22 @@
   display: grid;
   gap: 1.15rem;
 }
+/* Kelompok field (mis. Visi dan Misi / Sejarah / Potret Diri di Informasi Gereja) */
+.form-section {
+  margin: 0 0 1.25rem;
+  padding: 1.1rem 1.15rem 1.25rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--card);
+}
+.form-section-title {
+  padding: 0 0.4rem;
+  margin-left: -0.4rem;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--heading);
+}
 .field {
   display: grid;
   gap: 0.4rem;
