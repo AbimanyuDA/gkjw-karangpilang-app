@@ -4,7 +4,7 @@ class AppConstants {
   AppConstants._();
 
   // App Info
-  static const String appName = 'GKJW Karangpilang';
+  static const String appName = 'GKJW Karangpilang+';
   static const String appVersion = '1.0.0';
   static const String packageName = 'com.gkjw.gkjw_karangpilang';
 
