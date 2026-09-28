@@ -430,7 +430,7 @@ class _BannerCarousel extends StatelessWidget {
                     child: CachedNetworkImage(
                       imageUrl: banner.imageUrl,
                       fit: BoxFit.cover,
-                      memCacheWidth: 800,
+                      memCacheWidth: 1280, // = lebar ideal banner (1280 × 720) agar tetap tajam di layar HP
                       placeholder: (context, url) => Container(
                         color: AppColors.tint,
                         child: Center(

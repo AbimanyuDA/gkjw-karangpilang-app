@@ -8,12 +8,23 @@ const (
 	GroupInformasi = "Informasi & Pengaturan"
 )
 
+// Panduan ukuran gambar, mengikuti cara aplikasi menampilkannya.
+var (
+	wide16x9 = &ImageSpec{AspectW: 16, AspectH: 9, Width: 1280, Height: 720, MinWidth: 800, MinHeight: 450, Crop: true,
+		Note: "Tampil selebar layar HP dengan sudut membulat — jaga teks/logo ±60 px dari tepi"}
+	square = &ImageSpec{AspectW: 1, AspectH: 1, Width: 400, Height: 400, MinWidth: 200, MinHeight: 200,
+		Crop: true, Round: true, Note: "Ditampilkan dalam lingkaran — letakkan wajah di tengah"}
+	bookCover = &ImageSpec{AspectW: 3, AspectH: 4, Width: 600, Height: 800, MinWidth: 300, MinHeight: 400, Crop: true}
+	galeriImg = &ImageSpec{AspectW: 1, AspectH: 1, Width: 1600, Height: 1600, MinWidth: 600, MinHeight: 600,
+		Note: "Di daftar galeri ditampilkan kotak; foto lengkap terlihat saat diketuk"}
+)
+
 // Definisi field yang dipakai berulang.
 var (
 	urutanField = Field{Name: "urutan", Type: Int, NotNull: true, Min: intPtr(0), Max: intPtr(100000),
 		Label: "Urutan", Help: "Angka kecil tampil lebih dulu"}
 	fotoField = Field{Name: "foto_url", Type: Text, URL: true, MaxLen: 1000,
-		Label: "Foto", Input: InputImage, Upload: "profil"}
+		Label: "Foto", Input: InputImage, Upload: "profil", Image: square}
 )
 
 // All adalah daftar seluruh konten yang diekspos API.
@@ -90,9 +101,8 @@ var All = []Resource{
 		Table:       "banner_slide",
 		Fields: []Field{
 			{Name: "image_url", Type: Text, Required: true, URL: true, MaxLen: 1000,
-				Label: "Gambar", Input: InputImage, Upload: "banners"},
+				Label: "Gambar", Input: InputImage, Upload: "banners", Image: wide16x9},
 			{Name: "judul", Type: Text, MaxLen: 200, Label: "Judul"},
-			{Name: "link_url", Type: Text, URL: true, MaxLen: 1000, Label: "Link saat diketuk", Input: InputURL},
 			urutanField,
 			{Name: "is_active", Type: Bool, NotNull: true, Label: "Tampilkan", Input: InputSwitch},
 		},
@@ -108,7 +118,7 @@ var All = []Resource{
 		Table:      "galeri",
 		Fields: []Field{
 			{Name: "foto_url", Type: Text, Required: true, URL: true, MaxLen: 1000,
-				Label: "Foto", Input: InputImage, Upload: "galeri"},
+				Label: "Foto", Input: InputImage, Upload: "galeri", Image: galeriImg},
 			{Name: "judul", Type: Text, Required: true, MaxLen: 200, Label: "Judul"},
 			{Name: "tahun", Type: Int, Required: true, Min: intPtr(1900), Max: intPtr(2200), Label: "Tahun"},
 			{Name: "komisi", Type: Text, MaxLen: 200, Label: "Komisi / kegiatan"},
@@ -147,7 +157,7 @@ var All = []Resource{
 			{Name: "tahun", Type: Int, Min: intPtr(1500), Max: intPtr(2200), Label: "Tahun terbit"},
 			{Name: "file_url", Type: Text, Required: true, URL: true, MaxLen: 1000,
 				Label: "File PDF", Input: InputPDF, Upload: "eperpus"},
-			{Name: "cover_url", Type: Text, URL: true, MaxLen: 1000, Label: "Sampul", Input: InputImage, Upload: "eperpus-cover"},
+			{Name: "cover_url", Type: Text, URL: true, MaxLen: 1000, Label: "Sampul", Input: InputImage, Upload: "eperpus-cover", Image: bookCover},
 			{Name: "deskripsi", Type: Text, Label: "Sinopsis", Input: InputTextarea},
 		},
 		OrderBy: "created_at DESC",
@@ -200,7 +210,7 @@ var All = []Resource{
 				"informasi_gereja", "kependetaan", "kemajelisan", "bpm", "perwilayahan", "profil_ruangan",
 			}},
 			{Name: "image_url", Type: Text, Required: true, URL: true, MaxLen: 1000,
-				Label: "Gambar", Input: InputImage, Upload: "gereja-covers"},
+				Label: "Gambar", Input: InputImage, Upload: "gereja-covers", Image: wide16x9},
 		},
 		OrderBy:   "key ASC",
 		UpsertKey: "key",
@@ -220,7 +230,8 @@ var All = []Resource{
 			{Name: "nama", Type: Text, Required: true, MaxLen: 200, Label: "Nama ruangan"},
 			{Name: "kapasitas", Type: Int, Min: intPtr(0), Max: intPtr(100000), Label: "Kapasitas (orang)"},
 			{Name: "deskripsi", Type: Text, Label: "Keterangan", Input: InputTextarea},
-			fotoField,
+			{Name: "foto_url", Type: Text, URL: true, MaxLen: 1000, Label: "Foto ruangan",
+				Input: InputImage, Upload: "profil", Image: wide16x9},
 			urutanField,
 		},
 		OrderBy: "urutan ASC, created_at ASC",

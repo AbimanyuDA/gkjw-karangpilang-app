@@ -5,7 +5,6 @@ class BannerSlideModel {
   final String id;
   final String imageUrl;
   final String? judul;
-  final String? linkUrl;
   final int urutan;
   final bool isActive;
   final DateTime createdAt;
@@ -14,7 +13,6 @@ class BannerSlideModel {
     required this.id,
     required this.imageUrl,
     this.judul,
-    this.linkUrl,
     required this.urutan,
     required this.isActive,
     required this.createdAt,
@@ -25,7 +23,6 @@ class BannerSlideModel {
         id: json['id'],
         imageUrl: json['image_url'] ?? '',
         judul: json['judul'],
-        linkUrl: json['link_url'],
         urutan: json['urutan'] ?? 0,
         isActive: json['is_active'] ?? true,
         createdAt: json['created_at'] != null
@@ -36,7 +33,6 @@ class BannerSlideModel {
   Map<String, dynamic> toJson() => {
         'image_url': imageUrl,
         'judul': judul,
-        'link_url': linkUrl,
         'urutan': urutan,
         'is_active': isActive,
       };

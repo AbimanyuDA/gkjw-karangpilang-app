@@ -42,6 +42,19 @@ const (
 	InputYouTube  Input = "youtube" // ID video; admin bisa menempel link lengkap
 )
 
+// ImageSpec adalah panduan ukuran gambar sesuai cara aplikasi menampilkannya.
+type ImageSpec struct {
+	AspectW   int    `json:"aspect_w"` // rasio lebar, mis. 16
+	AspectH   int    `json:"aspect_h"` // rasio tinggi, mis. 9
+	Width     int    `json:"width"`    // ukuran ideal (px)
+	Height    int    `json:"height"`
+	MinWidth  int    `json:"min_width"` // di bawah ini gambar tampak pecah
+	MinHeight int    `json:"min_height"`
+	Note      string `json:"note,omitempty"`
+	Crop      bool   `json:"crop"`  // admin wajib memotong ke rasio ini sebelum upload
+	Round     bool   `json:"round"` // ditampilkan dalam lingkaran (pratinjau potong bulat)
+}
+
 // Field mendeskripsikan satu kolom yang boleh ditulis lewat API.
 type Field struct {
 	Name     string
@@ -58,7 +71,8 @@ type Field struct {
 	Label  string
 	Help   string
 	Input  Input
-	Upload string // bucket upload untuk InputImage / InputPDF
+	Upload string     // bucket upload untuk InputImage / InputPDF
+	Image  *ImageSpec // panduan ukuran untuk InputImage
 }
 
 // Resource mendeskripsikan satu tabel yang diekspos lewat API.

@@ -5,19 +5,20 @@ package resource
 
 // FieldSchema adalah deskripsi satu field untuk form admin.
 type FieldSchema struct {
-	Name      string   `json:"name"`
-	Label     string   `json:"label"`
-	Help      string   `json:"help,omitempty"`
-	Type      string   `json:"type"`
-	Input     Input    `json:"input"`
-	Required  bool     `json:"required"`
-	Nullable  bool     `json:"nullable"`
-	MaxLength int      `json:"max_length,omitempty"`
-	Options   []string `json:"options,omitempty"`
-	Min       *int     `json:"min,omitempty"`
-	Max       *int     `json:"max,omitempty"`
-	Pattern   string   `json:"pattern,omitempty"`
-	Upload    string   `json:"upload,omitempty"`
+	Name      string     `json:"name"`
+	Label     string     `json:"label"`
+	Help      string     `json:"help,omitempty"`
+	Type      string     `json:"type"`
+	Input     Input      `json:"input"`
+	Required  bool       `json:"required"`
+	Nullable  bool       `json:"nullable"`
+	MaxLength int        `json:"max_length,omitempty"`
+	Options   []string   `json:"options,omitempty"`
+	Min       *int       `json:"min,omitempty"`
+	Max       *int       `json:"max,omitempty"`
+	Pattern   string     `json:"pattern,omitempty"`
+	Upload    string     `json:"upload,omitempty"`
+	Image     *ImageSpec `json:"image,omitempty"`
 }
 
 // ResourceSchema adalah deskripsi satu jenis konten untuk admin.
@@ -61,6 +62,7 @@ func Describe(r Resource) ResourceSchema {
 			Max:       f.Max,
 			Pattern:   f.Pattern,
 			Upload:    f.Upload,
+			Image:     f.Image,
 		})
 	}
 	columns := r.Columns
