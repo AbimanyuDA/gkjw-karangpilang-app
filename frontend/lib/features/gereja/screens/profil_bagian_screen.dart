@@ -104,8 +104,6 @@ class _FotoHeader extends SliverPersistentHeaderDelegate {
     required this.fullHeight,
   });
 
-  static const _radius = 24.0;
-
   @override
   double get maxExtent => fullHeight + topPadding;
 
@@ -120,10 +118,8 @@ class _FotoHeader extends SliverPersistentHeaderDelegate {
   ) {
     // 0 = foto penuh, 1 = sudah mengecil sepenuhnya.
     final t = (shrinkOffset / (maxExtent - minExtent)).clamp(0.0, 1.0);
-    final radius = Radius.circular(_radius * t);
     return DecoratedBox(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.vertical(bottom: radius),
         boxShadow: [
           BoxShadow(
             color: AppColors.navy900.withValues(alpha: 0.25 * t),
@@ -132,8 +128,7 @@ class _FotoHeader extends SliverPersistentHeaderDelegate {
           ),
         ],
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.vertical(bottom: radius),
+      child: ClipRect(
         child: Stack(
           fit: StackFit.expand,
           children: [
