@@ -828,3 +828,49 @@ dialog::backdrop {
   margin-top: 0.5rem;
   flex-wrap: wrap;
 }
+
+/* ── Urutan dengan drag ─────────────────────────────── */
+.page-note {
+  margin: 0.4rem 0 0;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--accent-text);
+}
+.col-drag {
+  width: 1%;
+  padding-right: 0 !important;
+}
+.drag-handle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.35rem 0.4rem;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-subtle);
+  cursor: grab;
+  touch-action: none;
+}
+.drag-handle:hover {
+  background: var(--sunken);
+  color: var(--heading);
+}
+.drag-handle:active {
+  cursor: grabbing;
+}
+.drag-pos {
+  min-width: 1.1rem;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.table[data-sortable] tbody tr {
+  position: relative;
+  background: var(--card);
+}
+.table tbody tr[data-dragging] {
+  z-index: 2;
+  box-shadow: var(--shadow-lift);
+  background: var(--surface);
+}

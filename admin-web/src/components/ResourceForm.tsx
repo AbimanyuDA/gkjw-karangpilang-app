@@ -18,7 +18,9 @@ interface Props {
 
 export function ResourceForm({ resource, buckets, row, preset, onSaved, onCancel }: Props) {
   const isNew = !row && !resource.singleton
-  const [values, setValues] = useState<FormValues>(() => (row ? toFormValues(resource.fields, row) : emptyValues(resource.fields, preset)))
+  // Urutan diatur dengan drag di daftar; data baru otomatis ditaruh paling akhir oleh server.
+  const fields = resource.sortable ? resource.fields.filter((f) => f.name !== 'urutan') : resource.fields
+  const [values, setValues] = useState<FormValues>(() => (row ? toFormValues(fields, row) : emptyValues(fields, preset)))
   const [errors, setErrors] = useState<FormErrors>({})
   const [formError, setFormError] = useState<string | null>(null)
   const [uploading, setUploading] = useState(0)
@@ -45,14 +47,14 @@ export function ResourceForm({ resource, buckets, row, preset, onSaved, onCancel
   async function submit(e: FormEvent) {
     e.preventDefault()
     setFormError(null)
-    const found = validate(resource.fields, values)
+    const found = validate(fields, values)
     setErrors(found)
     if (Object.keys(found).length > 0) {
       document.getElementById(`f-${Object.keys(found)[0]}`)?.focus()
       return
     }
     try {
-      const saved = await save.mutateAsync({ id: row?.id, body: toPayload(resource.fields, values) })
+      const saved = await save.mutateAsync({ id: row?.id, body: toPayload(fields, values) })
       toast(isNew ? `${resource.label}: data ditambahkan` : 'Perubahan disimpan')
       onSaved?.(saved)
     } catch (err) {
@@ -68,7 +70,7 @@ export function ResourceForm({ resource, buckets, row, preset, onSaved, onCancel
   return (
     <form className="resource-form" onSubmit={submit} noValidate>
       <div className="form-fields">
-        {resource.fields.map((field) => (
+        {fields.map((field) => (
           <FieldInput
             key={field.name}
             field={field}

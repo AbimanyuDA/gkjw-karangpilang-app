@@ -27,7 +27,11 @@ type Repository interface {
 	GetSingleton(ctx context.Context, r Resource) (Row, error)
 	PutSingleton(ctx context.Context, r Resource, values Row) (Row, error)
 	DistinctInts(ctx context.Context, r Resource, column string) ([]int64, error)
+	Reorder(ctx context.Context, r Resource, ids []string) error
 }
+
+// maxReorder membatasi jumlah id per permintaan urutan.
+const maxReorder = 500
 
 // Handler melayani endpoint HTTP untuk satu Resource.
 type Handler struct {
@@ -62,6 +66,9 @@ func MountAdmin(router chi.Router, repo Repository, resources []Resource) {
 		}
 		router.Get("/"+res.Path, h.list(false))
 		router.Post("/"+res.Path, h.create)
+		if res.Sortable() {
+			router.Put("/"+res.Path+"/"+SortField, h.reorder)
+		}
 		router.Get("/"+res.Path+"/{id}", h.get(false))
 		router.Put("/"+res.Path+"/{id}", h.update)
 		router.Delete("/"+res.Path+"/{id}", h.delete)
@@ -149,6 +156,36 @@ func (h Handler) delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	httpx.OK(w, http.StatusOK, map[string]string{"id": id}, nil)
+}
+
+type reorderRequest struct {
+	IDs []string `json:"ids"`
+}
+
+// reorder: PUT /admin/{path}/urutan  body {"ids": [...]} — urutan sesuai posisi di array.
+func (h Handler) reorder(w http.ResponseWriter, r *http.Request) {
+	var req reorderRequest
+	if err := httpx.DecodeJSON(r, &req); err != nil {
+		httpx.Fail(w, r, err)
+		return
+	}
+	if len(req.IDs) == 0 || len(req.IDs) > maxReorder {
+		httpx.Fail(w, r, httpx.Validation(map[string]string{"ids": "harus berisi 1–500 id"}))
+		return
+	}
+	seen := make(map[string]bool, len(req.IDs))
+	for _, id := range req.IDs {
+		if _, err := uuid.Parse(id); err != nil || seen[id] {
+			httpx.Fail(w, r, httpx.Validation(map[string]string{"ids": "berisi id tidak valid atau ganda"}))
+			return
+		}
+		seen[id] = true
+	}
+	if err := h.repo.Reorder(r.Context(), h.res, req.IDs); err != nil {
+		httpx.Fail(w, r, err)
+		return
+	}
+	httpx.OK(w, http.StatusOK, map[string]int{"updated": len(req.IDs)}, nil)
 }
 
 func (h Handler) getSingleton(w http.ResponseWriter, r *http.Request) {

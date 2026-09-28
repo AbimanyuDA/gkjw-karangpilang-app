@@ -28,6 +28,7 @@ type ResourceSchema struct {
 	Group       string        `json:"group"`
 	Description string        `json:"description,omitempty"`
 	Singleton   bool          `json:"singleton"`
+	Sortable    bool          `json:"sortable"`
 	UpsertKey   string        `json:"upsert_key,omitempty"`
 	TitleField  string        `json:"title_field,omitempty"`
 	Columns     []string      `json:"columns"`
@@ -77,6 +78,7 @@ func Describe(r Resource) ResourceSchema {
 		Group:       r.Group,
 		Description: r.Description,
 		Singleton:   r.Singleton,
+		Sortable:    r.Sortable(),
 		UpsertKey:   r.UpsertKey,
 		TitleField:  r.TitleField,
 		Columns:     columns,

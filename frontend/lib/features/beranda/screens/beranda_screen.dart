@@ -20,8 +20,16 @@ class BerandaScreen extends ConsumerStatefulWidget {
   ConsumerState<BerandaScreen> createState() => _BerandaScreenState();
 }
 
+/// Halaman awal carousel. Carousel dibuat berputar: nomor halaman terus bertambah
+/// dan banner yang tampil = halaman % jumlah banner, jadi dari banner terakhir tetap
+/// bergeser ke kanan menuju banner pertama (dan bisa digeser ke kiri dari banner pertama).
+/// 5040 habis dibagi 1–10, sehingga halaman awal selalu menampilkan banner pertama.
+const _loopStartPage = 5040 * 100;
+
 class _BerandaScreenState extends ConsumerState<BerandaScreen> {
-  final PageController _pageController = PageController();
+  final PageController _pageController = PageController(
+    initialPage: _loopStartPage,
+  );
   int _currentBannerIndex = 0;
   Timer? _autoSlideTimer;
 
@@ -43,10 +51,9 @@ class _BerandaScreenState extends ConsumerState<BerandaScreen> {
       if (!mounted) return;
       final banners = ref.read(bannerSlidesProvider).value;
       if (banners == null || banners.isEmpty) return;
-      final next = (_currentBannerIndex + 1) % banners.length;
       if (_pageController.hasClients) {
         _pageController.animateToPage(
-          next,
+          (_pageController.page ?? _loopStartPage.toDouble()).round() + 1,
           duration: const Duration(milliseconds: 600),
           curve: Curves.easeInOut,
         );
@@ -131,8 +138,9 @@ class _BerandaScreenState extends ConsumerState<BerandaScreen> {
                     banners: banners,
                     pageController: _pageController,
                     currentIndex: _currentBannerIndex,
-                    onPageChanged: (i) =>
-                        setState(() => _currentBannerIndex = i),
+                    onPageChanged: (page) => setState(
+                      () => _currentBannerIndex = page % banners.length,
+                    ),
                   );
                 },
                 loading: () => _BannerPlaceholder(),
@@ -410,9 +418,9 @@ class _BannerCarousel extends StatelessWidget {
             child: PageView.builder(
               controller: pageController,
               onPageChanged: onPageChanged,
-              itemCount: banners.length,
-              itemBuilder: (context, index) {
-                final banner = banners[index];
+              // itemCount null = tak terbatas; banner diambil berputar.
+              itemBuilder: (context, page) {
+                final banner = banners[page % banners.length];
                 return Container(
                   decoration: BoxDecoration(
                     color: AppColors.cardBg,
@@ -464,7 +472,7 @@ class _BannerCarousel extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ...List.generate(banners.length, (i) {
-              final isActive = i == currentIndex;
+              final isActive = i == currentIndex % banners.length;
               return AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
                 margin: const EdgeInsets.symmetric(horizontal: 3),
@@ -480,7 +488,7 @@ class _BannerCarousel extends StatelessWidget {
             }),
             const SizedBox(width: 8),
             Text(
-              '${currentIndex + 1}/${banners.length}',
+              '${currentIndex % banners.length + 1}/${banners.length}',
               style: TextStyle(
                 fontFamily: 'PlusJakartaSans',
                 fontSize: 11,

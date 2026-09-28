@@ -54,6 +54,8 @@ export interface ResourceSchema {
   group: string
   description?: string
   singleton: boolean
+  /** Punya kolom "urutan": diurutkan dengan drag di daftar. */
+  sortable: boolean
   upsert_key?: string
   title_field?: string
   columns: string[]
