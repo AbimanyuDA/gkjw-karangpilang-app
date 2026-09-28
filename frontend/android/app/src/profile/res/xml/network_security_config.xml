@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Khusus build PROFILE (APK uji di HP sungguhan, lihat `make app-build-apk-lan`):
+     izinkan HTTP ke backend lokal di laptop lewat Wi-Fi (IP LAN berubah-ubah, jadi
+     tidak bisa didaftar per domain). Build RELEASE tetap HTTPS saja
+     (src/main/res/xml/network_security_config.xml). -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system"/>
+        </trust-anchors>
+    </base-config>
+</network-security-config>
