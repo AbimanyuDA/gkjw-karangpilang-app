@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../providers/providers.dart';
 import '../models/profil_bagian.dart';
+import '../models/teks_format.dart';
 import '../widgets/profil_bagian_card.dart';
 
 /// Halaman detail satu bagian profil gereja: foto besar di atas, lalu teksnya.
@@ -202,28 +203,31 @@ TextStyle get _bodyStyle => TextStyle(
   color: AppColors.textPrimary,
 );
 
-/// Teks dengan paragraf dipisah baris kosong.
+/// Teks berformat ala WhatsApp: paragraf, poin "- ", dan daftar bernomor "1. ".
 class _Paragraf extends StatelessWidget {
   final String text;
   const _Paragraf(this.text);
 
   @override
   Widget build(BuildContext context) {
-    final paragraf = text.split(RegExp(r'\n\s*\n'));
+    final blok = parseTeks(text);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        for (var i = 0; i < paragraf.length; i++)
+        for (var i = 0; i < blok.length; i++)
           Padding(
-            padding: EdgeInsets.only(bottom: i == paragraf.length - 1 ? 0 : 14),
-            child: Text(paragraf[i].trim(), style: _bodyStyle),
+            padding: EdgeInsets.only(bottom: i == blok.length - 1 ? 0 : 14),
+            child: switch (blok[i]) {
+              Paragraf(:final teks) => Text(teks, style: _bodyStyle),
+              Daftar(:final poin, :final mulai) => _Daftar(poin, mulai: mulai),
+            },
           ),
       ],
     );
   }
 }
 
-/// Satu poin per baris (misi), diberi nomor.
+/// Satu poin per baris (misi), selalu diberi nomor.
 class _DaftarPoin extends StatelessWidget {
   final String text;
   const _DaftarPoin(this.text);
@@ -235,34 +239,59 @@ class _DaftarPoin extends StatelessWidget {
         if (l.trim().isNotEmpty)
           l.trim().replaceFirst(RegExp(r'^(\d+[.)]|[-•*])\s*'), ''),
     ];
+    return _Daftar(poin, mulai: 1);
+  }
+}
+
+/// Daftar poin: titik emas, atau nomor dalam lingkaran bila [mulai] diisi.
+class _Daftar extends StatelessWidget {
+  final List<String> poin;
+  final int? mulai;
+  const _Daftar(this.poin, {this.mulai});
+
+  @override
+  Widget build(BuildContext context) {
+    final nomorAwal = mulai;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         for (var i = 0; i < poin.length; i++)
           Padding(
-            padding: const EdgeInsets.only(bottom: 10),
+            padding: EdgeInsets.only(bottom: i == poin.length - 1 ? 0 : 8),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: 24,
-                  height: 24,
-                  margin: const EdgeInsets.only(top: 2, right: 12),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: AppColors.gold600.withValues(alpha: 0.15),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Text(
-                    '${i + 1}',
-                    style: const TextStyle(
-                      fontFamily: 'PlusJakartaSans',
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
+                if (nomorAwal == null)
+                  Container(
+                    width: 6,
+                    height: 6,
+                    // Sejajar dengan tengah baris pertama (fontSize 15 × height 1.75).
+                    margin: const EdgeInsets.only(top: 10, left: 4, right: 14),
+                    decoration: const BoxDecoration(
                       color: AppColors.gold600,
+                      shape: BoxShape.circle,
+                    ),
+                  )
+                else
+                  Container(
+                    width: 24,
+                    height: 24,
+                    margin: const EdgeInsets.only(top: 2, right: 12),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: AppColors.gold600.withValues(alpha: 0.15),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Text(
+                      '${nomorAwal + i}',
+                      style: const TextStyle(
+                        fontFamily: 'PlusJakartaSans',
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.gold600,
+                      ),
                     ),
                   ),
-                ),
                 Expanded(child: Text(poin[i], style: _bodyStyle)),
               ],
             ),

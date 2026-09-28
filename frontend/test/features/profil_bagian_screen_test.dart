@@ -38,4 +38,30 @@ void main() {
     expect(fotoHeight(), closeTo(kToolbarHeight + 44, 0.5));
     expect(find.byType(BackButton), findsOneWidget);
   });
+
+  testWidgets('baris diawali "- " tampil sebagai poin tanpa tanda hubung', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          informasiGerejaProvider.overrideWith(
+            (ref) async => {
+              'potret_diri':
+                  '- Nama: GKJW Jemaat Karangpilang\n- Induk Awal: GKJW Jemaat Wiyung\n\nWilayah pelayanan.',
+            },
+          ),
+        ],
+        child: const MaterialApp(
+          home: ProfilBagianScreen(bagian: ProfilBagian.potretDiri),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Nama: GKJW Jemaat Karangpilang'), findsOneWidget);
+    expect(find.text('Induk Awal: GKJW Jemaat Wiyung'), findsOneWidget);
+    expect(find.textContaining('- Nama'), findsNothing);
+    expect(find.text('Wilayah pelayanan.'), findsOneWidget);
+  });
 }

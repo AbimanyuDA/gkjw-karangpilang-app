@@ -26,6 +26,9 @@ const (
 	sectionVisiMisi = "Visi dan Misi"
 	sectionSejarah  = "Sejarah"
 	sectionPotret   = "Potret Diri"
+
+	// Format teks ala WhatsApp yang dikenali aplikasi.
+	helpFormatTeks = "Baris kosong = paragraf baru. Awali baris dengan \"- \" untuk poin, atau \"1. \" untuk nomor."
 )
 
 // Definisi field yang dipakai berulang.
@@ -218,19 +221,19 @@ var All = []Resource{
 		Fields: []Field{
 			{Name: "visi_misi_foto", Type: Text, URL: true, MaxLen: 1000, Label: "Foto kartu",
 				Input: InputImage, Upload: "profil", Image: kartuProfil, Section: sectionVisiMisi},
-			{Name: "visi", Type: Text, Label: "Visi", Input: InputTextarea, Section: sectionVisiMisi},
+			{Name: "visi", Type: Text, Label: "Visi", Input: InputTextarea, Section: sectionVisiMisi, Help: helpFormatTeks},
 			{Name: "misi", Type: Text, Label: "Misi", Input: InputTextarea, Section: sectionVisiMisi,
 				Help: "Tulis satu poin per baris"},
 
 			{Name: "sejarah_foto", Type: Text, URL: true, MaxLen: 1000, Label: "Foto kartu",
 				Input: InputImage, Upload: "profil", Image: kartuProfil, Section: sectionSejarah},
 			{Name: "sejarah", Type: Text, Label: "Sejarah gereja", Input: InputTextarea, Section: sectionSejarah,
-				Help: "Pisahkan paragraf dengan baris kosong"},
+				Help: helpFormatTeks},
 
 			{Name: "potret_foto", Type: Text, URL: true, MaxLen: 1000, Label: "Foto kartu",
 				Input: InputImage, Upload: "profil", Image: kartuProfil, Section: sectionPotret},
 			{Name: "potret_diri", Type: Text, Label: "Potret diri", Input: InputTextarea, Section: sectionPotret,
-				Help: "Gambaran jemaat saat ini: jumlah warga, wilayah, pelayanan, dll. Pisahkan paragraf dengan baris kosong"},
+				Help: "Gambaran jemaat saat ini: jumlah warga, wilayah, pelayanan, dll. " + helpFormatTeks},
 		},
 	},
 	profilResource("kependetaan", "Kependetaan"),
