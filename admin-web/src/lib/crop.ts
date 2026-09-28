@@ -1,5 +1,6 @@
 // Logika potong gambar (murni, mudah diuji) + render hasil potongan ke Blob.
 import type { ImageSpec } from './schema'
+import { canvasEncoder, encodeImage } from './image'
 
 export interface Area {
   x: number
@@ -49,7 +50,7 @@ export function loadImage(src: string): Promise<HTMLImageElement> {
   })
 }
 
-/** Gambar area terpilih ke kanvas seukuran hasil, lalu jadikan file. */
+/** Gambar area terpilih ke kanvas seukuran hasil, lalu jadikan file WebP. */
 export async function renderCrop(src: string, area: Area, spec: ImageSpec, type: string): Promise<Blob> {
   const img = await loadImage(src)
   const size = outputSize(area, spec)
@@ -60,8 +61,5 @@ export async function renderCrop(src: string, area: Area, spec: ImageSpec, type:
   if (!ctx) throw new Error('Browser tidak mendukung pemotongan gambar.')
   ctx.imageSmoothingQuality = 'high'
   ctx.drawImage(img, area.x, area.y, area.width, area.height, 0, 0, size.width, size.height)
-  const outType = type === 'image/png' ? 'image/png' : 'image/jpeg'
-  const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, outType, 0.86))
-  if (!blob) throw new Error('Gagal memproses gambar.')
-  return blob
+  return encodeImage(canvasEncoder(canvas), type === 'image/png', 0.86)
 }

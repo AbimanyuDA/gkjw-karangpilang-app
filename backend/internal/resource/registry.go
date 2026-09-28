@@ -23,7 +23,7 @@ var (
 
 // Kelompok field di form Informasi Gereja.
 const (
-	sectionUmum     = "Umum & kontak"
+	sectionMenu     = "Kartu di menu Gereja"
 	sectionVisiMisi = "Visi dan Misi"
 	sectionSejarah  = "Sejarah"
 	sectionPotret   = "Potret Diri"
@@ -199,11 +199,9 @@ var All = []Resource{
 		Description: "Di aplikasi, halaman ini tampil sebagai tiga kartu bergambar: Visi dan Misi, Sejarah, dan Potret Diri. " +
 			"Foto tiap bagian menjadi gambar kartu sekaligus gambar utama saat kartu dibuka.",
 		Fields: []Field{
-			{Name: "nama", Type: Text, MaxLen: 200, Label: "Nama gereja", Section: sectionUmum},
-			{Name: "alamat", Type: Text, MaxLen: 500, Label: "Alamat", Input: InputTextarea, Section: sectionUmum},
-			{Name: "telepon", Type: Text, MaxLen: 50, Label: "Telepon", Section: sectionUmum},
-			{Name: "email", Type: Text, MaxLen: 200, Label: "Email", Section: sectionUmum},
-			{Name: "maps_url", Type: Text, URL: true, MaxLen: 1000, Label: "Link Google Maps", Input: InputURL, Section: sectionUmum},
+			{Name: "cover_foto", Type: Text, URL: true, MaxLen: 1000, Label: "Foto kartu Informasi Gereja",
+				Help:  "Gambar kartu \"Informasi Gereja\" di halaman Gereja aplikasi",
+				Input: InputImage, Upload: "gereja-covers", Image: kartuProfil, Section: sectionMenu},
 
 			{Name: "visi_misi_foto", Type: Text, URL: true, MaxLen: 1000, Label: "Foto kartu",
 				Input: InputImage, Upload: "profil", Image: kartuProfil, Section: sectionVisiMisi},
@@ -232,7 +230,7 @@ var All = []Resource{
 		Table:       "gereja_covers",
 		Fields: []Field{
 			{Name: "key", Type: Text, Required: true, Label: "Menu", Input: InputSelect, OneOf: []string{
-				"informasi_gereja", "kependetaan", "kemajelisan", "bpm", "perwilayahan", "profil_ruangan",
+				"kependetaan", "kemajelisan", "bpm", "perwilayahan", "profil_ruangan",
 			}},
 			{Name: "image_url", Type: Text, Required: true, URL: true, MaxLen: 1000,
 				Label: "Gambar", Input: InputImage, Upload: "gereja-covers", Image: wide16x9},

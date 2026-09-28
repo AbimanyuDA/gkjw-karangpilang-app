@@ -3,7 +3,6 @@ import 'package:gkjw_karangpilang/features/gereja/models/profil_bagian.dart';
 
 void main() {
   const info = <String, dynamic>{
-    'nama': 'GKJW Karangpilang',
     'visi': ' Menjadi gereja yang melayani ',
     'misi': '',
     'sejarah': 'Berdiri tahun 1930.',
@@ -19,13 +18,12 @@ void main() {
     expect(ProfilBagian.fromSlug(null), isNull);
   });
 
-  test('judul sejarah memakai nama gereja, dengan cadangan', () {
-    expect(
-      ProfilBagian.sejarah.judul(namaGereja(info)),
+  test('judul tiap bagian', () {
+    expect(ProfilBagian.values.map((b) => b.judul), [
+      'Visi dan Misi',
       'Sejarah GKJW Karangpilang',
-    );
-    expect(namaGereja(null), 'GKJW Karangpilang');
-    expect(namaGereja({'nama': 'GKJW X'}), 'GKJW X');
+      'Potret Diri',
+    ]);
   });
 
   test('foto kosong dianggap tidak ada', () {

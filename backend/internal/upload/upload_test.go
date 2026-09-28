@@ -148,3 +148,18 @@ func TestPathTraversalBlocked(t *testing.T) {
 		t.Error("empty reader must fail")
 	}
 }
+
+// Website admin mengubah semua foto ke WebP sebelum diunggah.
+func TestUpload_WebPStoredAsWebP(t *testing.T) {
+	_, h := newTestServer(t)
+	webp := append([]byte("RIFF\x24\x00\x00\x00WEBPVP8 \x18\x00\x00\x00"), bytes.Repeat([]byte{0}, 32)...)
+	rec := upload(t, h, "profil", webp)
+	if rec.Code != http.StatusCreated {
+		t.Fatalf("status = %d body = %s", rec.Code, rec.Body)
+	}
+	var resp struct{ Data Stored }
+	json.Unmarshal(rec.Body.Bytes(), &resp)
+	if !strings.HasSuffix(resp.Data.Name, ".webp") {
+		t.Errorf("stored = %+v", resp.Data)
+	}
+}

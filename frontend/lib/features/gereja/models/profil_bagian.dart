@@ -23,9 +23,9 @@ enum ProfilBagian {
     return null;
   }
 
-  String judul(String namaGereja) => switch (this) {
+  String get judul => switch (this) {
     ProfilBagian.visiMisi => 'Visi dan Misi',
-    ProfilBagian.sejarah => 'Sejarah $namaGereja',
+    ProfilBagian.sejarah => 'Sejarah GKJW Karangpilang',
     ProfilBagian.potretDiri => 'Potret Diri',
   };
 
@@ -58,7 +58,3 @@ String? _teks(Object? v) {
   final t = v.trim();
   return t.isEmpty ? null : t;
 }
-
-/// Nama gereja dari data admin, dengan cadangan bila belum diisi.
-String namaGereja(Map<String, dynamic>? info) =>
-    _teks(info?['nama']) ?? 'GKJW Karangpilang';
