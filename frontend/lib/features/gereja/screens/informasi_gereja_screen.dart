@@ -1,10 +1,14 @@
 // lib/features/gereja/screens/informasi_gereja_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../providers/providers.dart';
+import '../models/profil_bagian.dart';
+import '../widgets/profil_bagian_card.dart';
 
+/// Tiga kartu profil gereja (Visi dan Misi, Sejarah, Potret Diri) + kontak.
 class InformasiGerejaScreen extends ConsumerWidget {
   const InformasiGerejaScreen({super.key});
 
@@ -16,115 +20,28 @@ class InformasiGerejaScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Informasi Gereja')),
       body: infoAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => const Center(child: Text('Gagal memuat informasi')),
+        error: (e, _) => _Pesan(
+          'Gagal memuat informasi',
+          onRetry: () => ref.invalidate(informasiGerejaProvider),
+        ),
         data: (info) {
-          if (info == null) return const Center(child: Text('Data tidak tersedia'));
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          final data = info ?? const <String, dynamic>{};
+          final nama = namaGereja(info);
+          return RefreshIndicator(
+            onRefresh: () => ref.refresh(informasiGerejaProvider.future),
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 120),
               children: [
-                // Header card
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [AppColors.primary, AppColors.primaryDark],
-                    ),
-                    borderRadius: BorderRadius.circular(20),
+                for (final bagian in ProfilBagian.values) ...[
+                  ProfilBagianCard(
+                    title: bagian.judul(nama),
+                    imageUrl: bagian.foto(data),
+                    heroTag: 'profil-${bagian.slug}',
+                    onTap: () => context.go('/gereja/informasi/${bagian.slug}'),
                   ),
-                  child: Column(
-                    children: [
-                      Image.asset('assets/images/logo.png', width: 64, semanticLabel: 'Logo GKJW Karangpilang'),
-                      const SizedBox(height: 12),
-                      Text(
-                        info['nama'] ?? 'GKJW Karangpilang',
-                        style: const TextStyle(
-                          fontFamily: 'PlusJakartaSans',
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      if (info['alamat'] != null) ...[
-                        const SizedBox(height: 8),
-                        Text(
-                          info['alamat'],
-                          style: const TextStyle(
-                            fontFamily: 'PlusJakartaSans',
-                            color: Colors.white70,
-                            fontSize: 12,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 20),
-
-                if (info['deskripsi'] != null)
-                  _InfoSection(
-                    icon: Icons.info_outline,
-                    title: 'Tentang Gereja',
-                    content: info['deskripsi'],
-                  ),
-
-                if (info['visi'] != null)
-                  _InfoSection(
-                    icon: Icons.visibility_outlined,
-                    title: 'Visi',
-                    content: info['visi'],
-                  ),
-
-                if (info['misi'] != null)
-                  _InfoSection(
-                    icon: Icons.flag_outlined,
-                    title: 'Misi',
-                    content: info['misi'],
-                  ),
-
-                // Contact info
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Kontak',
-                          style: TextStyle(
-                            fontFamily: 'PlusJakartaSans',
-                            fontWeight: FontWeight.w700,
-                            fontSize: 15,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        if (info['telepon'] != null)
-                          _ContactRow(
-                            icon: Icons.phone_outlined,
-                            label: info['telepon'],
-                            onTap: () => launchUrl(Uri.parse('tel:${info['telepon']}')),
-                          ),
-                        if (info['email'] != null)
-                          _ContactRow(
-                            icon: Icons.email_outlined,
-                            label: info['email'],
-                            onTap: () => launchUrl(Uri.parse('mailto:${info['email']}')),
-                          ),
-                        if (info['maps_url'] != null)
-                          _ContactRow(
-                            icon: Icons.location_on_outlined,
-                            label: 'Lihat di Google Maps',
-                            onTap: () => launchUrl(Uri.parse(info['maps_url'])),
-                          ),
-                      ],
-                    ),
-                  ),
-                ),
+                  const SizedBox(height: 20),
+                ],
+                _KontakCard(info: data),
               ],
             ),
           );
@@ -134,49 +51,65 @@ class InformasiGerejaScreen extends ConsumerWidget {
   }
 }
 
-class _InfoSection extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String content;
-  const _InfoSection({required this.icon, required this.title, required this.content});
+class _KontakCard extends StatelessWidget {
+  final Map<String, dynamic> info;
+  const _KontakCard({required this.info});
+
+  String? _v(String key) {
+    final v = info[key];
+    return v is String && v.trim().isNotEmpty ? v.trim() : null;
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(icon, color: AppColors.primary, size: 20),
-                  const SizedBox(width: 8),
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontFamily: 'PlusJakartaSans',
-                      fontWeight: FontWeight.w700,
-                      fontSize: 15,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                ],
+    final alamat = _v('alamat');
+    final telepon = _v('telepon');
+    final email = _v('email');
+    final maps = _v('maps_url');
+    if (alamat == null && telepon == null && email == null && maps == null) {
+      return const SizedBox.shrink();
+    }
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Kontak',
+              style: TextStyle(
+                fontFamily: 'PlusJakartaSans',
+                fontWeight: FontWeight.w700,
+                fontSize: 15,
+                color: AppColors.textPrimary,
               ),
-              const SizedBox(height: 10),
-              Text(
-                content,
-                style: TextStyle(
-                  fontFamily: 'PlusJakartaSans',
-                  fontSize: 13,
-                  color: AppColors.textSecondary,
-                  height: 1.7,
-                ),
+            ),
+            const SizedBox(height: 4),
+            if (alamat != null)
+              _ContactRow(
+                icon: Icons.place_outlined,
+                label: alamat,
+                onTap: maps == null ? null : () => launchUrl(Uri.parse(maps)),
               ),
-            ],
-          ),
+            if (telepon != null)
+              _ContactRow(
+                icon: Icons.phone_outlined,
+                label: telepon,
+                onTap: () => launchUrl(Uri.parse('tel:$telepon')),
+              ),
+            if (email != null)
+              _ContactRow(
+                icon: Icons.email_outlined,
+                label: email,
+                onTap: () => launchUrl(Uri.parse('mailto:$email')),
+              ),
+            if (maps != null && alamat == null)
+              _ContactRow(
+                icon: Icons.map_outlined,
+                label: 'Lihat di Google Maps',
+                onTap: () => launchUrl(Uri.parse(maps)),
+              ),
+          ],
         ),
       ),
     );
@@ -186,8 +119,8 @@ class _InfoSection extends StatelessWidget {
 class _ContactRow extends StatelessWidget {
   final IconData icon;
   final String label;
-  final VoidCallback onTap;
-  const _ContactRow({required this.icon, required this.label, required this.onTap});
+  final VoidCallback? onTap;
+  const _ContactRow({required this.icon, required this.label, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -195,21 +128,50 @@ class _ContactRow extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(8),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.symmetric(vertical: 10),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Icon(icon, color: AppColors.primary, size: 20),
             const SizedBox(width: 12),
-            Text(
-              label,
-              style: TextStyle(
-                fontFamily: 'PlusJakartaSans',
-                fontSize: 13,
-                color: AppColors.textPrimary,
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontFamily: 'PlusJakartaSans',
+                  fontSize: 13,
+                  height: 1.5,
+                  color: AppColors.textPrimary,
+                ),
               ),
             ),
+            if (onTap != null)
+              Icon(
+                Icons.chevron_right_rounded,
+                color: AppColors.textSecondary,
+                size: 20,
+              ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _Pesan extends StatelessWidget {
+  final String text;
+  final VoidCallback onRetry;
+  const _Pesan(this.text, {required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(text, style: TextStyle(color: AppColors.textSecondary)),
+          TextButton(onPressed: onRetry, child: const Text('Coba lagi')),
+        ],
       ),
     );
   }

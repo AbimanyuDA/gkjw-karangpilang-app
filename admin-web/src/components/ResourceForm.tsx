@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { ApiError } from '../lib/api'
 import { emptyValues, toFormValues, toPayload, validate, type FormErrors, type FormValue, type FormValues } from '../lib/form'
 import { useSave } from '../lib/queries'
+import { groupBySection } from '../lib/sections'
 import type { BucketSchema, ResourceSchema, Row } from '../lib/schema'
 import { FieldInput } from './FieldInput'
 import { useToast } from '../lib/toast'
@@ -69,8 +70,8 @@ export function ResourceForm({ resource, buckets, row, preset, onSaved, onCancel
   const busy = save.isPending || uploading > 0
   return (
     <form className="resource-form" onSubmit={submit} noValidate>
-      <div className="form-fields">
-        {fields.map((field) => (
+      {groupBySection(fields).map((group) => {
+        const inputs = group.fields.map((field) => (
           <FieldInput
             key={field.name}
             field={field}
@@ -82,8 +83,18 @@ export function ResourceForm({ resource, buckets, row, preset, onSaved, onCancel
             onFill={fill}
             onBusyChange={(b) => setUploading((n) => Math.max(0, n + (b ? 1 : -1)))}
           />
-        ))}
-      </div>
+        ))
+        return group.title ? (
+          <fieldset key={group.title} className="form-section">
+            <legend className="form-section-title">{group.title}</legend>
+            <div className="form-fields">{inputs}</div>
+          </fieldset>
+        ) : (
+          <div key="_" className="form-fields">
+            {inputs}
+          </div>
+        )
+      })}
       {formError && (
         <p className="form-error" role="alert">
           {formError}

@@ -17,6 +17,16 @@ var (
 	bookCover = &ImageSpec{AspectW: 3, AspectH: 4, Width: 600, Height: 800, MinWidth: 300, MinHeight: 400, Crop: true}
 	galeriImg = &ImageSpec{AspectW: 1, AspectH: 1, Width: 1600, Height: 1600, MinWidth: 600, MinHeight: 600,
 		Note: "Di daftar galeri ditampilkan kotak; foto lengkap terlihat saat diketuk"}
+	kartuProfil = &ImageSpec{AspectW: 16, AspectH: 9, Width: 1280, Height: 720, MinWidth: 800, MinHeight: 450, Crop: true,
+		Note: "Judul kartu tampil di kiri bawah di atas bayangan gelap — letakkan bagian penting di tengah/atas"}
+)
+
+// Kelompok field di form Informasi Gereja.
+const (
+	sectionUmum     = "Umum & kontak"
+	sectionVisiMisi = "Visi dan Misi"
+	sectionSejarah  = "Sejarah"
+	sectionPotret   = "Potret Diri"
 )
 
 // Definisi field yang dipakai berulang.
@@ -186,15 +196,30 @@ var All = []Resource{
 		Path:      "informasi-gereja",
 		Table:     "informasi_gereja",
 		Singleton: true,
+		Description: "Di aplikasi, halaman ini tampil sebagai tiga kartu bergambar: Visi dan Misi, Sejarah, dan Potret Diri. " +
+			"Foto tiap bagian menjadi gambar kartu sekaligus gambar utama saat kartu dibuka.",
 		Fields: []Field{
-			{Name: "nama", Type: Text, MaxLen: 200, Label: "Nama gereja"},
-			{Name: "alamat", Type: Text, MaxLen: 500, Label: "Alamat", Input: InputTextarea},
-			{Name: "deskripsi", Type: Text, Label: "Sejarah singkat", Input: InputTextarea},
-			{Name: "visi", Type: Text, Label: "Visi", Input: InputTextarea},
-			{Name: "misi", Type: Text, Label: "Misi", Input: InputTextarea},
-			{Name: "telepon", Type: Text, MaxLen: 50, Label: "Telepon"},
-			{Name: "email", Type: Text, MaxLen: 200, Label: "Email"},
-			{Name: "maps_url", Type: Text, URL: true, MaxLen: 1000, Label: "Link Google Maps", Input: InputURL},
+			{Name: "nama", Type: Text, MaxLen: 200, Label: "Nama gereja", Section: sectionUmum},
+			{Name: "alamat", Type: Text, MaxLen: 500, Label: "Alamat", Input: InputTextarea, Section: sectionUmum},
+			{Name: "telepon", Type: Text, MaxLen: 50, Label: "Telepon", Section: sectionUmum},
+			{Name: "email", Type: Text, MaxLen: 200, Label: "Email", Section: sectionUmum},
+			{Name: "maps_url", Type: Text, URL: true, MaxLen: 1000, Label: "Link Google Maps", Input: InputURL, Section: sectionUmum},
+
+			{Name: "visi_misi_foto", Type: Text, URL: true, MaxLen: 1000, Label: "Foto kartu",
+				Input: InputImage, Upload: "profil", Image: kartuProfil, Section: sectionVisiMisi},
+			{Name: "visi", Type: Text, Label: "Visi", Input: InputTextarea, Section: sectionVisiMisi},
+			{Name: "misi", Type: Text, Label: "Misi", Input: InputTextarea, Section: sectionVisiMisi,
+				Help: "Tulis satu poin per baris"},
+
+			{Name: "sejarah_foto", Type: Text, URL: true, MaxLen: 1000, Label: "Foto kartu",
+				Input: InputImage, Upload: "profil", Image: kartuProfil, Section: sectionSejarah},
+			{Name: "sejarah", Type: Text, Label: "Sejarah gereja", Input: InputTextarea, Section: sectionSejarah,
+				Help: "Pisahkan paragraf dengan baris kosong"},
+
+			{Name: "potret_foto", Type: Text, URL: true, MaxLen: 1000, Label: "Foto kartu",
+				Input: InputImage, Upload: "profil", Image: kartuProfil, Section: sectionPotret},
+			{Name: "potret_diri", Type: Text, Label: "Potret diri", Input: InputTextarea, Section: sectionPotret,
+				Help: "Gambaran jemaat saat ini: jumlah warga, wilayah, pelayanan, dll. Pisahkan paragraf dengan baris kosong"},
 		},
 	},
 	{

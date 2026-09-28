@@ -15,6 +15,8 @@ import '../../features/beranda/screens/inspirasi_screen.dart';
 import '../../features/siaran/screens/siaran_screen.dart';
 import '../../features/gereja/screens/gereja_screen.dart';
 import '../../features/gereja/screens/informasi_gereja_screen.dart';
+import '../../features/gereja/screens/profil_bagian_screen.dart';
+import '../../features/gereja/models/profil_bagian.dart';
 import '../../features/gereja/screens/kependetaan_screen.dart';
 import '../../features/gereja/screens/kemajelisan_screen.dart';
 import '../../features/gereja/screens/bpm_screen.dart';
@@ -64,7 +66,20 @@ GoRouter createAppRouter() => GoRouter(
           path: '/gereja',
           pageBuilder: (context, state) => const NoTransitionPage(child: GerejaScreen()),
           routes: [
-            GoRoute(path: 'informasi', builder: (c, s) => const InformasiGerejaScreen()),
+            GoRoute(
+              path: 'informasi',
+              builder: (c, s) => const InformasiGerejaScreen(),
+              routes: [
+                // /gereja/informasi/{visi-misi|sejarah|potret-diri}
+                GoRoute(
+                  path: ':bagian',
+                  redirect: (c, s) =>
+                      ProfilBagian.fromSlug(s.pathParameters['bagian']) == null ? '/gereja/informasi' : null,
+                  builder: (c, s) =>
+                      ProfilBagianScreen(bagian: ProfilBagian.fromSlug(s.pathParameters['bagian'])!),
+                ),
+              ],
+            ),
             GoRoute(path: 'kependetaan', builder: (c, s) => const KependetaanScreen()),
             GoRoute(path: 'kemajelisan', builder: (c, s) => const KemajelisanScreen()),
             GoRoute(path: 'bpm', builder: (c, s) => const BpmScreen()),

@@ -73,6 +73,8 @@ type Field struct {
 	Input  Input
 	Upload string     // bucket upload untuk InputImage / InputPDF
 	Image  *ImageSpec // panduan ukuran untuk InputImage
+	// Section mengelompokkan field berurutan di form admin di bawah satu judul.
+	Section string
 }
 
 // Resource mendeskripsikan satu tabel yang diekspos lewat API.

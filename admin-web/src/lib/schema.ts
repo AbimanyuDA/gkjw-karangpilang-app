@@ -46,6 +46,8 @@ export interface FieldSchema {
   pattern?: string
   upload?: string
   image?: ImageSpec
+  /** Judul kelompok di form; field berurutan dengan section sama tampil bersama. */
+  section?: string
 }
 
 export interface ResourceSchema {

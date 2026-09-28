@@ -19,6 +19,7 @@ type FieldSchema struct {
 	Pattern   string     `json:"pattern,omitempty"`
 	Upload    string     `json:"upload,omitempty"`
 	Image     *ImageSpec `json:"image,omitempty"`
+	Section   string     `json:"section,omitempty"`
 }
 
 // ResourceSchema adalah deskripsi satu jenis konten untuk admin.
@@ -64,6 +65,7 @@ func Describe(r Resource) ResourceSchema {
 			Pattern:   f.Pattern,
 			Upload:    f.Upload,
 			Image:     f.Image,
+			Section:   f.Section,
 		})
 	}
 	columns := r.Columns
